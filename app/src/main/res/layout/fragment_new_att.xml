@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/raison_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:chipSpacingVertical="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:singleLine="false"
+        app:singleSelection="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/raison_work"
+            android:layout_width="256dp"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:text="Trajet Domicile-Travail"
+            app:chipIcon="@drawable/ic_baseline_home_work_24" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/raison_courses"
+            android:layout_width="256dp"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:text="Courses"
+            app:chipIcon="@drawable/ic_baseline_shopping_cart_24" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/raison_sante"
+            android:layout_width="256dp"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:text="Santé"
+            app:chipIcon="@drawable/ic_baseline_medical_services_24" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/raison_prommenade"
+            android:layout_width="256dp"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:text="Prommenade"
+            app:chipIcon="@drawable/ic_baseline_directions_walk_24" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/raison_enfants"
+            android:layout_width="256dp"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:text="Ecole"
+            app:chipIcon="@drawable/ic_baseline_school_24" />
+    </com.google.android.material.chip.ChipGroup>
+
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/raison_group" />
+
+    <TimePicker
+        android:id="@+id/timePicker1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:timePickerMode="spinner"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/divider3"
+        app:layout_constraintTop_toBottomOf="@+id/divider2" />
+
+    <View
+        android:id="@+id/divider3"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/timePicker1" />
+
+    <Button
+        android:id="@+id/button_generer"
+        style="@android:style/Widget.DeviceDefault.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@android:drawable/editbox_dropdown_dark_frame"
+        android:text="Generer"
+        app:iconTint="@color/cardview_shadow_end_color"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider3" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

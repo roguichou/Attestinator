@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/notif_layout"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:background="@color/black"
+    android:theme="@style/CardView.Light">
+
+    <ImageView
+        android:id="@+id/imageView7"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="8dp"
+        android:foregroundTint="@color/white"
+        android:scaleType="centerCrop"
+        android:tint="@color/white"
+        android:translationY="16dp"
+        tools:srcCompat="@drawable/ic_baseline_av_timer_24" />
+
+    <TextView
+        android:id="@+id/notif_timer_txt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="xx:xx"
+        android:textColor="@color/white"
+        android:textSize="20dp"
+        android:translationY="14dp" />
+
+    <ImageView
+        android:id="@+id/imageView8"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="32dp"
+        android:scaleType="centerCrop"
+        android:tint="@color/white"
+        android:translationY="16dp"
+        tools:srcCompat="@drawable/ic_fb2de6e2bfe43558df3892839dd64a5c" />
+
+    <TextView
+        android:id="@+id/notif_dist_txt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="00000 m"
+        android:textColor="@color/white"
+        android:textSize="20dp"
+        android:translationY="14dp" />
+
+    <ImageButton
+        android:id="@+id/imageButton"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/roundedbutton"
+        android:scaleType="centerCrop"
+        android:translationX="32dp"
+        android:translationY="12dp"
+        tools:src="@mipmap/ic_attestinator" />
+
+    <ImageButton
+        android:id="@+id/imageButton2"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/roundedbutton"
+        android:scaleType="centerCrop"
+        android:translationX="32dp"
+        android:translationY="12dp"
+        tools:src="@mipmap/ic_attestinator_close" />
+</LinearLayout>
