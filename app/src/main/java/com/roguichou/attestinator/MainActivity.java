@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
@@ -20,6 +22,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.zxing.WriterException;
 import com.tom_roush.pdfbox.io.RandomAccessBufferedFileInputStream;
 import com.tom_roush.pdfbox.pdfparser.PDFParser;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
@@ -33,18 +36,22 @@ import com.tom_roush.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import com.tom_roush.pdfbox.util.Matrix;
 import com.tom_roush.pdfbox.util.PDFBoxResourceLoader;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 
 import android.view.Menu;
 import android.view.MenuItem;
 
 import android.content.Intent;
+import android.view.WindowManager;
+import android.view.WindowMetrics;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -52,6 +59,7 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import androidmads.library.qrgenearator.QRGContents;
 import androidmads.library.qrgenearator.QRGEncoder;
@@ -65,6 +73,9 @@ public class MainActivity extends AppCompatActivity {
     private static final String KEY_ADD = "addresse";
     private static final String KEY_POST_CODE = "code_postal";
     private static final String KEY_CITY = "ville";
+    private static final String KEY_RAISON = "raison";
+    private static final String KEY_H = "heure";
+    private static final String KEY_MIN = "min";
 
     private static final int REQUEST_CODE_PERM_LOC = 0x753;
 
@@ -88,11 +99,13 @@ public class MainActivity extends AppCompatActivity {
     private Calendar heureSortie = null;
     private Location home = null;
 
+    private Raison raison = null;
+    Bitmap qrBitmap = null;
+
     public static final String CHANNEL_ID = "SortieServiceChannel";
 
 
     private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel serviceChannel = new NotificationChannel(
                     CHANNEL_ID,
                     "Sortie Service Channel",
@@ -100,7 +113,6 @@ public class MainActivity extends AppCompatActivity {
             );
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(serviceChannel);
-        }
     }
 
 
@@ -126,6 +138,19 @@ public class MainActivity extends AppCompatActivity {
         profil_city = settings.getString(KEY_CITY, null);
 
 
+        String raison_s = settings.getString(KEY_RAISON, null);
+        if(null!= raison_s) {
+            raison = Raison.fromString(raison_s);
+
+            int h = settings.getInt(KEY_H, 0);
+            int min = settings.getInt(KEY_MIN, 0);
+            heureSortie = Calendar.getInstance();
+            heureSortie.set(Calendar.HOUR_OF_DAY, h);
+            heureSortie.set(Calendar.MINUTE, min);
+
+
+            genererQRcode(null);
+        }
         PDFBoxResourceLoader.init(getApplicationContext());
 
         createNotificationChannel();
@@ -217,9 +242,9 @@ public class MainActivity extends AppCompatActivity {
         profil_city = _val;
     }
 
-
-
-
+    public Bitmap getQrBitmap() {
+        return qrBitmap;
+    }
 
     public void saveProfil() {
         SharedPreferences.Editor editor;
@@ -233,13 +258,52 @@ public class MainActivity extends AppCompatActivity {
         editor.putString(KEY_POST_CODE, profil_post_code);
         editor.putString(KEY_CITY, profil_city);
 
-        editor.commit();
+        editor.apply();
+    }
+
+    private String getTimeAsString()
+    {
+        return String.format(Locale.FRENCH, "%02d:%02d",  heureSortie.get(Calendar.HOUR_OF_DAY), heureSortie.get(Calendar.MINUTE));
     }
 
 
-    public void genererAttestation(View view, Raison raison, int h, int min) {
-        InputStream input = null;
-        PDDocument doc = null;
+    private void genererQRcode(View view)
+    {
+        SimpleDateFormat frmt = new SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH);
+        String today = frmt.format(heureSortie.getTime());
+        String data = "Cree le: " + today + " a " + getTimeAsString() + ";\n" +
+                "Nom: " + profil_name + "\n" + "Prenom: " + profil_first_name + ";\n" +
+                "Naissance: " + profil_birth_date + " a " + profil_birth_location + ";\n" +
+                "Adresse: " + profil_address + " " + profil_post_code + " " + profil_city + ";\n" +
+                "Sortie: " + today + " a " + getTimeAsString() + ";\n" +
+                "Motifs: " + raison.toString()+";\n";
+
+        WindowManager mgr= getWindowManager();
+        WindowMetrics metrics = mgr.getCurrentWindowMetrics();
+        Rect ecran = metrics.getBounds();
+        QRGEncoder qrgEncoder = new QRGEncoder(data, null, QRGContents.Type.TEXT, ecran.width());
+
+        try {
+            qrBitmap = qrgEncoder.encodeAsBitmap();
+        } catch (WriterException e) {
+            if(view!= null) {
+                Snackbar mySnackbar = Snackbar.make(view, "Erreur à la génération de l'attestation", Snackbar.LENGTH_SHORT);
+                mySnackbar.show();
+            }
+            e.printStackTrace();
+        }
+
+
+        if(view!= null)
+        {
+            Snackbar mySnackbar = Snackbar.make(view, "Attestation générée", Snackbar.LENGTH_SHORT);
+            mySnackbar.show();
+        }
+    }
+
+    private void genererPDF(View view) {
+        InputStream input;
+        PDDocument doc;
         try {
             input = getResources().openRawResource(R.raw.certificate);
             RandomAccessBufferedFileInputStream istream = new RandomAccessBufferedFileInputStream(input);
@@ -277,12 +341,12 @@ public class MainActivity extends AppCompatActivity {
 
             contentStream.setTextMatrix(Matrix.getTranslateInstance(91, 153));
             Calendar calendar = Calendar.getInstance();
-            SimpleDateFormat frmt = new SimpleDateFormat("dd/MM/yyyy");
+            SimpleDateFormat frmt = new SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH);
             String today = frmt.format(calendar.getTime());
             contentStream.showText(today);
 
             contentStream.setTextMatrix(Matrix.getTranslateInstance(264, 153));
-            contentStream.showText(String.format("%02d:%02d", h, min));
+            contentStream.showText(getTimeAsString());
 
 
             contentStream.setFont(font, 18.0f);
@@ -290,11 +354,11 @@ public class MainActivity extends AppCompatActivity {
             contentStream.showText("x");
             contentStream.endText();
 
-            String data = "Cree le: " + today + " a " + String.valueOf(h) + ":" + String.valueOf(min) + "\n" +
+            String data = "Cree le: " + today + " a " + getTimeAsString() + "\n" +
                     "Nom: " + profil_name + "\n" + "Prenom: " + profil_first_name + "\n" +
                     "Naissance: " + profil_birth_date + " a " + profil_birth_location + "\n" +
                     "Adresse: " + profil_address + " " + profil_post_code + " " + profil_city + "\n" +
-                    "Sortie: " + today + " a " + String.format("%02d:%02d", h, min) + "\n" +
+                    "Sortie: " + today + " a " + getTimeAsString() + "\n" +
                     "Motifs: " + raison.toString();
 
             QRGEncoder qrgEncoder = new QRGEncoder(data, null, QRGContents.Type.TEXT, 96);
@@ -316,7 +380,7 @@ public class MainActivity extends AppCompatActivity {
             contentStream2.close();
         } catch (Exception e) {
             Snackbar mySnackbar = Snackbar.make(view, "Erreur à l'édition du PDF " + e.toString(), Snackbar.LENGTH_SHORT);
-            Log.e("Atestation-inator",  e.toString());
+            Log.e("Atestation-inator", e.toString());
             mySnackbar.show();
             return;
         }
@@ -331,18 +395,39 @@ public class MainActivity extends AppCompatActivity {
         }
 
         try {
-            if(null!=input) {input.close();}
+            if (null != input) {
+                input.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-             Snackbar mySnackbar = Snackbar.make(view, "Attestation générée", Snackbar.LENGTH_SHORT);
-             mySnackbar.show();
+        Snackbar mySnackbar = Snackbar.make(view, "Attestation générée", Snackbar.LENGTH_SHORT);
+        mySnackbar.show();
+    }
+
+    public void genererAttestation(View view, Raison raison, int h, int min) {
+        this.raison= raison;
+        heureSortie = Calendar.getInstance();
+        heureSortie.set(Calendar.HOUR_OF_DAY, h);
+        heureSortie.set(Calendar.MINUTE, min);
+
+        SharedPreferences.Editor editor;
+        editor = settings.edit();
+        editor.putString(KEY_RAISON, raison.toString());
+        editor.putInt(KEY_H, h);
+        editor.putInt(KEY_MIN, min);
+        editor.apply();
+
+        genererQRcode(view);
+        genererPDF(view);
     }
 
 
+
+
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
         /*@param requestCode The request code passed in {@link #requestPermissions(
          * android.app.Activity, String[], int)}
@@ -380,10 +465,7 @@ public class MainActivity extends AppCompatActivity {
         ContextCompat.startForegroundService(this, serviceIntent);
     }
 
-    public void debuterSortie(View view, int h, int min) {
-        heureSortie = Calendar.getInstance();
-        heureSortie.set(Calendar.HOUR_OF_DAY, h);
-        heureSortie.set(Calendar.MINUTE, min);
+    public void debuterSortie(int h, int min) {
 
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -394,8 +476,6 @@ public class MainActivity extends AppCompatActivity {
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_PERM_LOC);
-
-            return;
         }
         else
         {
@@ -420,10 +500,5 @@ public class MainActivity extends AppCompatActivity {
 
             fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
         }
-
-/*        Intent serviceIntent = new Intent(this, SortieService.class);
-        serviceIntent.putExtra("heure", heureSortie);
-        ContextCompat.startForegroundService(this, serviceIntent);
-*/
     }
 }

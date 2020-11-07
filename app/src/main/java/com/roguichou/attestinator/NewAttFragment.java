@@ -123,18 +123,16 @@ public class NewAttFragment extends Fragment {
                 }
                 else
                 {
+                    ((MainActivity)getActivity()).genererAttestation(fragmentView, raison, picker.getHour(), picker.getMinute());
 
                     if (raison == Raison.SPORT_ANIMAUX) {
-                        ((MainActivity)getActivity()).debuterSortie (fragmentView, picker.getHour(), picker.getMinute());
+                        ((MainActivity)getActivity()).debuterSortie (picker.getHour(), picker.getMinute());
                     }
-                    ((MainActivity)getActivity()).genererAttestation(fragmentView, raison, picker.getHour(), picker.getMinute());
+
 
                     NavHostFragment.findNavController(NewAttFragment.this)
                             .navigate(R.id.action_newAttFragment_to_FirstFragment);
 
-                    //String msg = "raison sélectionnée : "+ raison.toString()+ " H départ:"+picker.getHour()+":"+picker.getMinute();
-                    //Snackbar mySnackbar = Snackbar.make(fragmentView, msg, Snackbar.LENGTH_SHORT);
-                    //mySnackbar.show();
                 }
 
 

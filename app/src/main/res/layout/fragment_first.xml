@@ -35,18 +35,17 @@
         app:srcCompat="@drawable/ic_baseline_library_add_24" />
 
     <ImageButton
-        android:id="@+id/button_show"
+        android:id="@+id/button_show_qr"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/roundedbutton"
         android:contentDescription="@string/afficher_attestation"
         android:scaleType="centerInside"
-        app:layout_constraintBottom_toTopOf="@+id/textView3"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/button_show_pdf"
         app:layout_constraintStart_toEndOf="@+id/button_show_home"
         app:layout_constraintTop_toBottomOf="@+id/divider"
-        app:srcCompat="@drawable/ic_attestinator" />
+        app:srcCompat="@drawable/ic_qr_covid" />
 
     <TextView
         android:id="@+id/textView"
@@ -73,9 +72,9 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="@string/afficher_attestation"
-        app:layout_constraintEnd_toEndOf="@+id/button_show"
-        app:layout_constraintStart_toStartOf="@+id/button_show"
-        app:layout_constraintTop_toBottomOf="@+id/button_show" />
+        app:layout_constraintEnd_toEndOf="@+id/button_show_pdf"
+        app:layout_constraintStart_toStartOf="@+id/button_show_pdf"
+        app:layout_constraintTop_toBottomOf="@+id/button_show_pdf" />
 
     <View
         android:id="@+id/divider"
@@ -105,7 +104,7 @@
         android:background="@drawable/roundedbutton"
         android:scaleType="centerInside"
         android:src="@drawable/ic_noun_attestation_824051"
-        app:layout_constraintEnd_toStartOf="@+id/button_show"
+        app:layout_constraintEnd_toStartOf="@+id/button_show_qr"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider" />
 
@@ -141,4 +140,26 @@
             android:layout_height="match_parent" />
 
     </TableLayout>
+
+    <ImageButton
+        android:id="@+id/button_show_pdf"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/roundedbutton"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_attestinator"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/button_show_qr"
+        app:layout_constraintTop_toBottomOf="@+id/divider" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/afficher_nqrcode"
+        app:layout_constraintEnd_toEndOf="@+id/button_show_qr"
+        app:layout_constraintStart_toStartOf="@+id/button_show_qr"
+        app:layout_constraintTop_toBottomOf="@+id/button_show_qr" />
 </androidx.constraintlayout.widget.ConstraintLayout>

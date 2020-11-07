@@ -1,5 +1,6 @@
 package com.roguichou.attestinator;
 
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.os.Bundle;
 
@@ -32,10 +33,7 @@ import java.io.InputStream;
  */
 public class AfficherFragment extends Fragment {
 
-    ScaleGestureDetector SGD;
     ImageView image;
-    Matrix matrix = new Matrix();
-    float scale = 1f;
     View fragmentView = null;
 
     public AfficherFragment() {
@@ -48,9 +46,7 @@ public class AfficherFragment extends Fragment {
      * @return A new instance of fragment AfficherFragment.
      */
     public static AfficherFragment newInstance() {
-        AfficherFragment fragment = new AfficherFragment();
-
-        return fragment;
+        return new AfficherFragment();
     }
 
     @Override
@@ -75,31 +71,42 @@ public class AfficherFragment extends Fragment {
 
         image = view.findViewById(R.id.pdf_renderer);
 
+        String fichier = getArguments().getString("fichier");
 
-        InputStream input = null;
-        PDDocument doc = null;
-        try {
-            File attestation = new File(getActivity().getFilesDir()+"/"+getArguments().getString("fichier"));
-            input = new FileInputStream(attestation);
-            RandomAccessBufferedFileInputStream istream = new RandomAccessBufferedFileInputStream(input);
-            PDFParser parser = new PDFParser(istream);
-            parser.parse();
-            doc = parser.getPDDocument();
-        } catch (Exception e) {
-            Snackbar mySnackbar = Snackbar.make(view, "Erreur à l'ouverture du fichier " + e.toString(), Snackbar.LENGTH_SHORT);
-            mySnackbar.show();
-            return;
+        if( null == fichier)
+        {
+            view.setBackgroundColor(Color.BLACK);
+            image.setImageBitmap(((MainActivity)getActivity()).getQrBitmap());
+        }
+        else {
+            view.setBackgroundColor(Color.WHITE);
+            InputStream input;
+            PDDocument doc;
+            try {
+                File attestation = new File(getActivity().getFilesDir() + "/" + fichier);
+                input = new FileInputStream(attestation);
+                RandomAccessBufferedFileInputStream istream = new RandomAccessBufferedFileInputStream(input);
+                PDFParser parser = new PDFParser(istream);
+                parser.parse();
+                doc = parser.getPDDocument();
+            } catch (Exception e) {
+                Snackbar mySnackbar = Snackbar.make(view, "Erreur à l'ouverture du fichier " + e.toString(), Snackbar.LENGTH_SHORT);
+                mySnackbar.show();
+                return;
+            }
+
+            PDFRenderer renderer = new PDFRenderer(doc);
+
+            try {
+                image.setImageBitmap(renderer.renderImage(0));
+            } catch (IOException e) {
+                Snackbar mySnackbar = Snackbar.make(view, "Erreur au rendu du fichier " + e.toString(), Snackbar.LENGTH_SHORT);
+                mySnackbar.show();
+                e.printStackTrace();
+            }
         }
 
-        PDFRenderer renderer = new PDFRenderer(doc);
 
-        try {
-            image.setImageBitmap(renderer.renderImage(0));
-        } catch (IOException e) {
-            Snackbar mySnackbar = Snackbar.make(view, "Erreur au rendu du fichier " + e.toString(), Snackbar.LENGTH_SHORT);
-            mySnackbar.show();
-            e.printStackTrace();
-        }
 
     }
 

@@ -51,7 +51,25 @@ public class FirstFragment extends Fragment {
             }
         });
 
-        view.findViewById(R.id.button_show).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.button_show_qr).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                File attestation = new File(getActivity().getFilesDir()+"/attestation.pdf");
+                if (attestation.exists()) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("fichier", null);
+                    NavHostFragment.findNavController(FirstFragment.this)
+                            .navigate(R.id.action_FirstFragment_to_afficherFragment, bundle);
+                }
+                else
+                {
+                    Snackbar mySnackbar = Snackbar.make(view, "Aucune attestation à afficher.", Snackbar.LENGTH_SHORT);
+                    mySnackbar.show();
+                }
+            }
+        });
+
+        view.findViewById(R.id.button_show_pdf).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 File attestation = new File(getActivity().getFilesDir()+"/attestation.pdf");

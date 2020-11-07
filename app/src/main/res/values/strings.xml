@@ -21,4 +21,9 @@
     <string name="lieu_de_naissance">Lieu de naissance</string>
     <string name="timer">Timer</string>
     <string name="afficher_njustificatif_ndomicile">Afficher\nJustificatif\nDomicile</string>
+    <string name="dur_e">durée</string>
+    <string name="xx_xx">xx:xx</string>
+    <string name="_00000_m">00000 m</string>
+    <string name="distance">distance</string>
+    <string name="afficher_nqrcode">Afficher\nQRcode</string>
 </resources>
