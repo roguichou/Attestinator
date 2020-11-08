@@ -1,29 +1,21 @@
 package com.roguichou.attestinator;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
-import android.util.Log;
+import android.os.ParcelFileDescriptor;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
 import com.google.android.material.snackbar.Snackbar;
-import com.tom_roush.pdfbox.io.RandomAccessBufferedFileInputStream;
-import com.tom_roush.pdfbox.pdfparser.PDFParser;
-import com.tom_roush.pdfbox.pdmodel.PDDocument;
-import com.tom_roush.pdfbox.rendering.PDFRenderer;
+import android.graphics.pdf.PdfRenderer;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -35,7 +27,7 @@ public class AfficherFragment extends Fragment {
 
     ImageView image;
     View fragmentView = null;
-
+    //PDDocument doc = null;
     public AfficherFragment() {
         // Required empty public constructor
     }
@@ -83,28 +75,20 @@ public class AfficherFragment extends Fragment {
         else {
             view.setBackgroundColor(Color.WHITE);
             InputStream input;
-            PDDocument doc;
+
             try {
                 File attestation = new File(getActivity().getFilesDir() + "/" + fichier);
-                input = new FileInputStream(attestation);
-                RandomAccessBufferedFileInputStream istream = new RandomAccessBufferedFileInputStream(input);
-                PDFParser parser = new PDFParser(istream);
-                parser.parse();
-                doc = parser.getPDDocument();
+                ParcelFileDescriptor fd =	ParcelFileDescriptor.open(attestation,ParcelFileDescriptor.MODE_READ_ONLY);
+                PdfRenderer renderer =new PdfRenderer(fd);
+                PdfRenderer.Page page = renderer.openPage(0);
+                Bitmap bitmap = Bitmap.createBitmap(page.getWidth(), page.getHeight(), Bitmap.Config.ARGB_8888);
+                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+                image.setImageBitmap(bitmap);
+                page.close();
+                fd.close();
             } catch (Exception e) {
                 Snackbar mySnackbar = Snackbar.make(view, "Erreur à l'ouverture du fichier " + e.toString(), Snackbar.LENGTH_SHORT);
                 mySnackbar.show();
-                return;
-            }
-
-            PDFRenderer renderer = new PDFRenderer(doc);
-
-            try {
-                image.setImageBitmap(renderer.renderImage(0));
-            } catch (IOException e) {
-                Snackbar mySnackbar = Snackbar.make(view, "Erreur au rendu du fichier " + e.toString(), Snackbar.LENGTH_SHORT);
-                mySnackbar.show();
-                e.printStackTrace();
             }
         }
 

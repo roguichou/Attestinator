@@ -30,6 +30,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 
 import java.util.Calendar;
+import java.util.Locale;
 
 public class SortieService extends Service {
 
@@ -90,37 +91,34 @@ public class SortieService extends Service {
             handler = new Handler(Looper.getMainLooper());
 
             // Define the code block to be executed
-            runnableCode = new Runnable() {
-                @Override
-                public void run() {
-                    // Do something here on the main thread
-                    Calendar maintenant = Calendar.getInstance();
-                    Calendar heure_sortie = currentActivity.getHeureSortie();
-                    long delta = (maintenant.getTimeInMillis() - heure_sortie.getTimeInMillis()) / 1000;
-                    delta = 60 * 60 - delta;
-                    int min = (int) (delta / 60);
-                    int sec = (int) (delta - min * 60);
+            runnableCode = () -> {
+                // Do something here on the main thread
+                Calendar maintenant = Calendar.getInstance();
+                Calendar heure_sortie = currentActivity.getHeureSortie();
+                long delta = (maintenant.getTimeInMillis() - heure_sortie.getTimeInMillis()) / 1000;
+                delta = 60 * 60 - delta;
+                int min = (int) (delta / 60);
+                int sec = (int) (delta - min * 60);
 
-                    notificationLayout.setTextViewText(R.id.notif_timer_txt,String.format("%02d:%02d", min, sec));
+                notificationLayout.setTextViewText(R.id.notif_timer_txt,String.format(Locale.FRANCE,"%02d:%02d", min, sec));
 
-                    if (delta < 5 * 60) {
-                        notificationLayout.setTextColor(R.id.notif_timer_txt, Color.RED);
-                    } else {
-                        notificationLayout.setTextColor(R.id.notif_timer_txt, Color.LTGRAY);
-                    }
-
-                    mNotificationManager.notify(NOTIFICATION_ID,notification_builder.build());
-
-                    // Repeat this the same runnable code block again another 1 seconds
-                    handler.postDelayed(runnableCode, 1000);
+                if (delta < 5 * 60) {
+                    notificationLayout.setTextColor(R.id.notif_timer_txt, Color.RED);
+                } else {
+                    notificationLayout.setTextColor(R.id.notif_timer_txt, Color.LTGRAY);
                 }
+
+                mNotificationManager.notify(NOTIFICATION_ID,notification_builder.build());
+
+                // Repeat this the same runnable code block again another 1 seconds
+                handler.postDelayed(runnableCode, 1000);
             };
             // Start the initial runnable task by posting through the handler
             handler.post(runnableCode);
 
             locationRequest = LocationRequest.create();
             locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            locationRequest.setInterval(10 * 1000);
+            locationRequest.setInterval(60 * 1000);
 
             locationCallback = new LocationCallback() {
                 @Override
@@ -134,7 +132,7 @@ public class SortieService extends Service {
 
                             int dist = (int) location.distanceTo(home);
                             //Log.d("ATTESTINATOR", "home:"+home.toString()+"loc:" + location.toString() + " dist=" + dist);
-                            notificationLayout.setTextViewText(R.id.notif_dist_txt, String.format("%d m", dist));
+                            notificationLayout.setTextViewText(R.id.notif_dist_txt, String.format(Locale.FRENCH,"%d m", dist));
 
                             if (dist > 1000) {
                                 notificationLayout.setTextColor(R.id.notif_dist_txt, Color.RED);
