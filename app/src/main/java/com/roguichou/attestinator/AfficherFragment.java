@@ -16,30 +16,12 @@ import com.google.android.material.snackbar.Snackbar;
 import android.graphics.pdf.PdfRenderer;
 
 import java.io.File;
-import java.io.InputStream;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link AfficherFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class AfficherFragment extends Fragment {
 
     ImageView image;
-    View fragmentView = null;
-    //PDDocument doc = null;
-    public AfficherFragment() {
-        // Required empty public constructor
-    }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     * @return A new instance of fragment AfficherFragment.
-     */
-    public static AfficherFragment newInstance() {
-        return new AfficherFragment();
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,12 +32,7 @@ public class AfficherFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_afficher, container, false);
-
-        fragmentView = view;
-
-        return view;
+        return inflater.inflate(R.layout.fragment_afficher, container, false);
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -74,7 +51,6 @@ public class AfficherFragment extends Fragment {
         }
         else {
             view.setBackgroundColor(Color.WHITE);
-            InputStream input;
 
             try {
                 File attestation = new File(getActivity().getFilesDir() + "/" + fichier);

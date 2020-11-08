@@ -1,12 +1,9 @@
 package com.roguichou.attestinator;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.provider.DocumentsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
@@ -43,102 +40,81 @@ public class NewAttFragment extends Fragment {
 
         fragmentView = view;
 
-        view.findViewById(R.id.button_generer).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //1. vérifier qu'on a bien une raison
-                int chip_id = ((ChipGroup)fragmentView.findViewById(R.id.raison_group)).getCheckedChipId();
+        view.findViewById(R.id.button_generer).setOnClickListener(view1 -> {
+            //1. vérifier qu'on a bien une raison
+            int chip_id = ((ChipGroup)fragmentView.findViewById(R.id.raison_group)).getCheckedChipId();
 
-                if (ChipGroup.NO_ID == chip_id )
-                {
-                    String msg = "Pas de raison sélectionnée";
-                    Snackbar mySnackbar = Snackbar.make(fragmentView, msg, Snackbar.LENGTH_SHORT);
-                    mySnackbar.show();
-                }
-                else
-                {
-                    String msg = "raison sélectionnée : "+chip_id;
-                    Snackbar mySnackbar = Snackbar.make(fragmentView, msg, Snackbar.LENGTH_SHORT);
-                    mySnackbar.show();
-                }
-
-
+            if (ChipGroup.NO_ID == chip_id )
+            {
+                String msg = "Pas de raison sélectionnée";
+                Snackbar mySnackbar = Snackbar.make(fragmentView, msg, Snackbar.LENGTH_SHORT);
+                mySnackbar.show();
             }
+            else
+            {
+                String msg = "raison sélectionnée : "+chip_id;
+                Snackbar mySnackbar = Snackbar.make(fragmentView, msg, Snackbar.LENGTH_SHORT);
+                mySnackbar.show();
+            }
+
+
         });
 
 
 
-        ((Chip)view.findViewById(R.id.raison_work)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    raison = Raison.TRAVAIL;
-                }
+        ((Chip)view.findViewById(R.id.raison_work)).setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                raison = Raison.TRAVAIL;
             }
         });
 
-        ((Chip)view.findViewById(R.id.raison_courses)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    raison = Raison.ACHATS;
-                }
+        ((Chip)view.findViewById(R.id.raison_courses)).setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                raison = Raison.ACHATS;
             }
         });
-        ((Chip)view.findViewById(R.id.raison_sante)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    raison = Raison.SANTE;
-                }
+        ((Chip)view.findViewById(R.id.raison_sante)).setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                raison = Raison.SANTE;
             }
         });
-        ((Chip)view.findViewById(R.id.raison_prommenade)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    raison = Raison.SPORT_ANIMAUX;
-                }
+        ((Chip)view.findViewById(R.id.raison_prommenade)).setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                raison = Raison.SPORT_ANIMAUX;
             }
         });
-        ((Chip)view.findViewById(R.id.raison_enfants)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    raison = Raison.ENFANTS;
-                }
+        ((Chip)view.findViewById(R.id.raison_enfants)).setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                raison = Raison.ENFANTS;
             }
         });
 
 
-        view.findViewById(R.id.button_generer).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //1. vérifier qu'on a bien une raison
-                int chip_id = ((ChipGroup)fragmentView.findViewById(R.id.raison_group)).getCheckedChipId();
+        view.findViewById(R.id.button_generer).setOnClickListener(view12 -> {
+            //1. vérifier qu'on a bien une raison
+            int chip_id = ((ChipGroup)fragmentView.findViewById(R.id.raison_group)).getCheckedChipId();
 
-                if (ChipGroup.NO_ID == chip_id  || null == raison)
-                {
-                    String msg = "Pas de raison sélectionnée";
-                    Snackbar mySnackbar = Snackbar.make(fragmentView, msg, Snackbar.LENGTH_SHORT);
-                    mySnackbar.show();
-                }
-                else
-                {
-                    ((MainActivity)getActivity()).genererAttestation(fragmentView, raison, picker.getHour(), picker.getMinute());
+            if (ChipGroup.NO_ID == chip_id  || null == raison)
+            {
+                String msg = "Pas de raison sélectionnée";
+                Snackbar mySnackbar = Snackbar.make(fragmentView, msg, Snackbar.LENGTH_SHORT);
+                mySnackbar.show();
+            }
+            else
+            {
+                ((MainActivity)getActivity()).genererAttestation(fragmentView, raison, picker.getHour(), picker.getMinute());
 
-                    if (raison == Raison.SPORT_ANIMAUX) {
-                        ((MainActivity)getActivity()).debuterSortie (picker.getHour(), picker.getMinute());
-                    }
-
-
-                    NavHostFragment.findNavController(NewAttFragment.this)
-                            .navigate(R.id.action_newAttFragment_to_FirstFragment);
-
+                if (raison == Raison.SPORT_ANIMAUX) {
+                    ((MainActivity)getActivity()).debuterSortie ();
                 }
 
+
+                NavHostFragment.findNavController(NewAttFragment.this)
+                        .navigate(R.id.action_newAttFragment_to_FirstFragment);
 
             }
+
+
         });
 
 

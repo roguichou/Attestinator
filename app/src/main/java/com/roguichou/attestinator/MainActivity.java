@@ -461,14 +461,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void demarrerService()
     {
-        Intent serviceIntent = new Intent(this, SortieService.class);
- //       serviceIntent.putExtra("heure", heureSortie);
- //       serviceIntent.putExtra("home", home);
-  //      serviceIntent.putExtra("activty", this);
-        ContextCompat.startForegroundService(this, serviceIntent);
+        ContextCompat.startForegroundService(this,
+                new Intent(this, SortieService.class));
     }
 
-    public void debuterSortie(int h, int min) {
+    public void debuterSortie() {
 
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);

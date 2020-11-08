@@ -4,9 +4,6 @@ import android.app.Activity;
 import android.app.Application;
 
 public class MyApp extends Application {
-    public void onCreate() {
-        super.onCreate();
-    }
 
     private Activity mCurrentActivity = null;
     public Activity getCurrentActivity(){

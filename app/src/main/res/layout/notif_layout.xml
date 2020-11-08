@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/notif_layout"
     android:layout_width="match_parent"
     android:layout_height="64dp"
     android:background="@color/black"
@@ -15,9 +15,9 @@
         android:contentDescription="@string/dur_e"
         android:foregroundTint="@color/white"
         android:scaleType="centerCrop"
-        android:tint="@color/white"
         android:translationY="16dp"
-        tools:srcCompat="@drawable/ic_baseline_av_timer_24" />
+        tools:srcCompat="@drawable/ic_baseline_av_timer_24"
+        app:tint="@color/white" />
 
     <TextView
         android:id="@+id/notif_timer_txt"
@@ -25,6 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="@string/xx_xx"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:textColor="@color/white"
         android:textSize="20sp"
         android:translationY="14dp" />
@@ -36,9 +37,9 @@
         android:layout_marginStart="32dp"
         android:contentDescription="@string/distance"
         android:scaleType="centerCrop"
-        android:tint="@color/white"
         android:translationY="16dp"
-        tools:srcCompat="@drawable/ic_fb2de6e2bfe43558df3892839dd64a5c" />
+        tools:srcCompat="@drawable/ic_fb2de6e2bfe43558df3892839dd64a5c"
+        app:tint="@color/white" />
 
     <TextView
         android:id="@+id/notif_dist_txt"
@@ -46,6 +47,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="@string/_00000_m"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:textColor="@color/white"
         android:textSize="20sp"
         android:translationY="14dp" />
@@ -56,6 +58,7 @@
         android:layout_height="32dp"
         android:layout_marginEnd="32dp"
         android:background="@drawable/roundedbutton"
+        android:contentDescription="@string/restart"
         android:scaleType="centerCrop"
         android:translationX="64dp"
         android:translationY="12dp"
@@ -67,6 +70,7 @@
         android:layout_height="32dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/roundedbutton"
+        android:contentDescription="@string/close"
         android:scaleType="centerCrop"
         android:translationX="48dp"
         android:translationY="12dp"

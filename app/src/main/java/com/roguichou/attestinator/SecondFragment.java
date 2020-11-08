@@ -13,7 +13,6 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
 
 import com.tom_roush.pdfbox.io.RandomAccessBufferedFileInputStream;
 import com.tom_roush.pdfbox.pdfparser.PDFParser;
@@ -156,48 +155,36 @@ public class SecondFragment extends Fragment {
         }
 
 
-        view.findViewById(R.id.attestation_dom).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("application/pdf");
+        view.findViewById(R.id.attestation_dom).setOnClickListener(view1 -> {
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("application/pdf");
 
-                startActivityForResult(intent, PICK_FILE_DOM);
-            }
+            startActivityForResult(intent, PICK_FILE_DOM);
         });
 
-        view.findViewById(R.id.att_work).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("application/pdf");
+        view.findViewById(R.id.att_work).setOnClickListener(view12 -> {
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("application/pdf");
 
-                startActivityForResult(intent, PICK_FILE_WORK);
-            }
+            startActivityForResult(intent, PICK_FILE_WORK);
         });
 
-        view.findViewById(R.id.att_creche).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("application/pdf");
+        view.findViewById(R.id.att_creche).setOnClickListener(view13 -> {
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("application/pdf");
 
-                startActivityForResult(intent, PICK_FILE_CRECHE);
-            }
+            startActivityForResult(intent, PICK_FILE_CRECHE);
         });
 
-        view.findViewById(R.id.att_ecole).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("application/pdf");
+        view.findViewById(R.id.att_ecole).setOnClickListener(view14 -> {
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("application/pdf");
 
-                startActivityForResult(intent, PICK_FILE_ECOLE);
-            }
+            startActivityForResult(intent, PICK_FILE_ECOLE);
         });
 
 

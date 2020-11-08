@@ -9,7 +9,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -17,13 +16,10 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
-import android.widget.ImageButton;
 import android.widget.RemoteViews;
-import android.widget.TextView;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -34,13 +30,12 @@ import java.util.Locale;
 
 public class SortieService extends Service {
 
-    private static int NOTIFICATION_ID = 0x10;
+    private static final int NOTIFICATION_ID = 0x10;
     private Handler handler = null;
     private Runnable runnableCode = null;
     private NotificationManager mNotificationManager;
     MainActivity currentActivity = null;
 
-    private LocationRequest locationRequest;
     private LocationCallback locationCallback;
 
     Notification notification;
@@ -116,7 +111,7 @@ public class SortieService extends Service {
             // Start the initial runnable task by posting through the handler
             handler.post(runnableCode);
 
-            locationRequest = LocationRequest.create();
+            LocationRequest locationRequest = LocationRequest.create();
             locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
             locationRequest.setInterval(60 * 1000);
 

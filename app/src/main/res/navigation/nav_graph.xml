@@ -2,7 +2,6 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nav_graph"
     app:startDestination="@id/FirstFragment">
 
     <fragment
@@ -17,9 +16,6 @@
         <action
             android:id="@+id/action_FirstFragment_to_newAttFragment"
             app:destination="@id/newAttFragment" />
-        <action
-            android:id="@+id/action_FirstFragment_to_timerFragment"
-            app:destination="@id/timerFragment" />
         <action
             android:id="@+id/action_FirstFragment_to_afficherFragment"
             app:destination="@id/afficherFragment" />
@@ -40,15 +36,6 @@
         android:label="NewAttFragment" >
         <action
             android:id="@+id/action_newAttFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/timerFragment"
-        android:name="com.roguichou.attestinator.TimerFragment"
-        android:label="fragment_timer"
-        tools:layout="@layout/fragment_timer" >
-        <action
-            android:id="@+id/action_timerFragment_to_FirstFragment"
             app:destination="@id/FirstFragment" />
     </fragment>
     <fragment

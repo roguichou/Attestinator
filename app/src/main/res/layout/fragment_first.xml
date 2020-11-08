@@ -48,7 +48,6 @@
         app:srcCompat="@drawable/ic_qr_covid" />
 
     <TextView
-        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/profil"
@@ -67,7 +66,6 @@
         app:layout_constraintTop_toBottomOf="@+id/button_new" />
 
     <TextView
-        android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -102,6 +100,7 @@
         android:layout_height="64dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/roundedbutton"
+        android:contentDescription="@string/afficher_domicile"
         android:scaleType="centerInside"
         android:src="@drawable/ic_noun_attestation_824051"
         app:layout_constraintEnd_toStartOf="@+id/button_show_qr"
@@ -124,6 +123,7 @@
         android:layout_height="64dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/roundedbutton"
+        android:contentDescription="@string/afficher_pdf"
         android:scaleType="centerInside"
         android:src="@drawable/ic_attestinator"
         app:layout_constraintEnd_toEndOf="parent"
@@ -131,7 +131,6 @@
         app:layout_constraintTop_toBottomOf="@+id/divider" />
 
     <TextView
-        android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -146,6 +145,7 @@
         android:layout_height="64dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/roundedbutton"
+        android:contentDescription="@string/afficher_travail"
         android:src="@drawable/ic_att_travail"
         app:layout_constraintEnd_toStartOf="@+id/button_show_creche"
         app:layout_constraintStart_toStartOf="parent"
@@ -157,6 +157,7 @@
         android:layout_height="64dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/roundedbutton"
+        android:contentDescription="@string/afficher_creche"
         android:src="@drawable/ic_att_creche"
         app:layout_constraintEnd_toStartOf="@+id/button_show_school"
         app:layout_constraintStart_toEndOf="@+id/button_show_work"
@@ -168,37 +169,35 @@
         android:layout_height="64dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/roundedbutton"
+        android:contentDescription="@string/afficher_cole"
         android:src="@drawable/ic_att_ecole"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/button_show_creche"
         app:layout_constraintTop_toBottomOf="@+id/divider4" />
 
     <TextView
-        android:id="@+id/textView6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Attestation\nTravail"
+        android:text="@string/attestation_ntravail"
         app:layout_constraintEnd_toEndOf="@+id/button_show_work"
         app:layout_constraintStart_toStartOf="@+id/button_show_work"
         app:layout_constraintTop_toBottomOf="@+id/button_show_work" />
 
     <TextView
-        android:id="@+id/textView7"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Attestation\nCrèche"
+        android:text="@string/attestation_ncr_che"
         app:layout_constraintEnd_toEndOf="@+id/button_show_creche"
         app:layout_constraintStart_toStartOf="@+id/button_show_creche"
         app:layout_constraintTop_toBottomOf="@+id/button_show_creche" />
 
     <TextView
-        android:id="@+id/textView8"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Attestation\nEcole"
+        android:text="@string/attestation_necole"
         app:layout_constraintEnd_toEndOf="@+id/button_show_school"
         app:layout_constraintStart_toStartOf="@+id/button_show_school"
         app:layout_constraintTop_toBottomOf="@+id/button_show_school" />

@@ -1,29 +1,44 @@
 <resources>
     <string name="app_name">Attestation-inator</string>
-    <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
 
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="nouvelle_attestation"> Générer\nattestation</string>
     <string name="profil">Profil</string>
     <string name="afficher_attestation">Afficher\nattestation</string>
     <string name="identit">Identité</string>
-    <string name="back">Back</string>
     <string name="pr_nom">Prénom</string>
     <string name="nom">Nom</string>
     <string name="naissance">Naissance</string>
     <string name="date_de_naissance">Date de naissance</string>
     <string name="lieu_de_naissance">Lieu de naissance</string>
-    <string name="timer">Timer</string>
     <string name="afficher_njustificatif_ndomicile">Afficher\nJustificatif\nDomicile</string>
     <string name="dur_e">durée</string>
     <string name="xx_xx">xx:xx</string>
     <string name="_00000_m">00000 m</string>
     <string name="distance">distance</string>
     <string name="afficher_nqrcode">Afficher\nQRcode</string>
+    <string name="restart">Restart</string>
+    <string name="close">Close</string>
+    <string name="attestation_ntravail">Attestation\nTravail</string>
+    <string name="attestation_ncr_che">Attestation\nCrèche</string>
+    <string name="attestation_necole">Attestation\nEcole</string>
+    <string name="afficher_pdf">Afficher PDF</string>
+    <string name="afficher_travail">Afficher Travail</string>
+    <string name="afficher_creche">Afficher crèche</string>
+    <string name="afficher_cole">Afficher école</string>
+    <string name="afficher_domicile">Afficher domicile</string>
+    <string name="trajet_domicile_travail">Trajet Domicile-Travail</string>
+    <string name="courses">Courses</string>
+    <string name="sant">Santé</string>
+    <string name="prommenade">Prommenade</string>
+    <string name="generer">Generer</string>
+    <string name="cp">CP</string>
+    <string name="ville">Ville</string>
+    <string name="domicile">Domicile</string>
+    <string name="work">Work</string>
+    <string name="cr_che">Crèche</string>
+    <string name="ecole">Ecole</string>
+    <string name="adresse">Adresse</string>
 </resources>
