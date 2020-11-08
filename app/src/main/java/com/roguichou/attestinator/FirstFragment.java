@@ -106,5 +106,62 @@ public class FirstFragment extends Fragment {
                 }
             }
         });
+
+
+        view.findViewById(R.id.button_show_work).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                File attestation = new File(getActivity().getFilesDir()+"/att_work.pdf");
+                if (attestation.exists()) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("fichier", "att_work.pdf");
+                    NavHostFragment.findNavController(FirstFragment.this)
+                            .navigate(R.id.action_FirstFragment_to_afficherFragment, bundle);
+                }
+                else
+                {
+                    Snackbar mySnackbar = Snackbar.make(view, "Aucune attestation à afficher.", Snackbar.LENGTH_SHORT);
+                    mySnackbar.show();
+                }
+            }
+        });
+
+
+        view.findViewById(R.id.button_show_creche).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                File attestation = new File(getActivity().getFilesDir()+"/att_creche.pdf");
+                if (attestation.exists()) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("fichier", "att_creche.pdf");
+                    NavHostFragment.findNavController(FirstFragment.this)
+                            .navigate(R.id.action_FirstFragment_to_afficherFragment, bundle);
+                }
+                else
+                {
+                    Snackbar mySnackbar = Snackbar.make(view, "Aucune attestation à afficher.", Snackbar.LENGTH_SHORT);
+                    mySnackbar.show();
+                }
+            }
+        });
+
+        view.findViewById(R.id.button_show_school).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                File attestation = new File(getActivity().getFilesDir()+"/att_ecole.pdf");
+                if (attestation.exists()) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("fichier", "att_ecole.pdf");
+                    NavHostFragment.findNavController(FirstFragment.this)
+                            .navigate(R.id.action_FirstFragment_to_afficherFragment, bundle);
+                }
+                else
+                {
+                    Snackbar mySnackbar = Snackbar.make(view, "Aucune attestation à afficher.", Snackbar.LENGTH_SHORT);
+                    mySnackbar.show();
+                }
+            }
+        });
+
     }
 }

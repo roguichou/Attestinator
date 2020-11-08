@@ -27,7 +27,11 @@ import java.io.InputStream;
 public class SecondFragment extends Fragment {
 
 
-    private  static final int PICK_FILE = 0x12;
+    private  static final int PICK_FILE_DOM = 0xE1;
+    private  static final int PICK_FILE_WORK = 0xE2;
+    private  static final int PICK_FILE_CRECHE = 0xE3;
+    private  static final int PICK_FILE_ECOLE = 0xE4;
+
 
     private View fragmentView = null;
 
@@ -41,16 +45,58 @@ public class SecondFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_second, container, false);
     }
 
+    @Override
+    public void onPause() {
+
+            Editable profil_name = ((EditText) fragmentView.findViewById(R.id.editTextTextPersonName)).getText();
+            if(null != profil_name){ ((MainActivity)getActivity()).setProfilName(profil_name.toString());}
+
+            Editable profil_first_name = ((EditText) fragmentView.findViewById(R.id.editTextTextPersonName2)).getText();
+            if(null != profil_first_name){ ((MainActivity)getActivity()).setProfilFirstName(profil_first_name.toString());}
+
+            Editable profil_birth_date = ((EditText) fragmentView.findViewById(R.id.editTextDate)).getText();
+            if(null != profil_birth_date){ ((MainActivity)getActivity()).setProfilBirthDate(profil_birth_date.toString());}
+
+            Editable profil_birth_location = ((EditText) fragmentView.findViewById(R.id.editTextBirthPlace)).getText();
+            if(null != profil_birth_location){ ((MainActivity)getActivity()).setProfilBirthLocation(profil_birth_location.toString());}
+
+            Editable profil_address = ((EditText) fragmentView.findViewById(R.id.editTextTextPostalAddress2)).getText();
+            if(null != profil_address){ ((MainActivity)getActivity()).setProfilAddress(profil_address.toString());}
+
+            Editable profil_post_code = ((EditText) fragmentView.findViewById(R.id.editTextCP)).getText();
+            if(null != profil_post_code){ ((MainActivity)getActivity()).setProfilPostCode(profil_post_code.toString());}
+
+            Editable profil_city = ((EditText) fragmentView.findViewById(R.id.editTextCity)).getText();
+            if(null != profil_city){ ((MainActivity)getActivity()).setProfilCity(profil_city.toString());}
+
+
+            ((MainActivity)getActivity()).saveProfil();
+
+        super.onPause();
+    }
 
     @Override
     public  void onActivityResult(int requestCode, int resultCode,
                                  Intent resultData) {
-        if (requestCode == PICK_FILE
-                && resultCode == Activity.RESULT_OK) {
-            // The result data contains a URI for the document or directory that
-            // the user selected.
+        String fn = null;
+        if (resultCode == Activity.RESULT_OK ) {
+            switch (requestCode)
+            {
+                case PICK_FILE_DOM :
+                    fn="att_dom.pdf";
+                    break;
+                case PICK_FILE_WORK :
+                    fn="att_work.pdf";
+                    break;
+                case PICK_FILE_CRECHE :
+                    fn="att_creche.pdf";
+                    break;
+                case PICK_FILE_ECOLE :
+                    fn="att_ecole.pdf";
+                    break;
+            }
+            if (null!=fn && resultData != null) {
 
-            if (resultData != null) {
                 Uri attestation_dom = resultData.getData();
                 try {
                     InputStream inputStream = getContext().getContentResolver().openInputStream(attestation_dom);
@@ -59,7 +105,7 @@ public class SecondFragment extends Fragment {
                     parser.parse();
                     PDDocument doc = parser.getPDDocument();
 
-                    FileOutputStream fos = getContext().openFileOutput("att_dom.pdf", Context.MODE_PRIVATE);
+                    FileOutputStream fos = getContext().openFileOutput(fn, Context.MODE_PRIVATE);
                     doc.save(fos);
                     inputStream.close();
 
@@ -71,6 +117,7 @@ public class SecondFragment extends Fragment {
             }
         }
     }
+
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -116,41 +163,45 @@ public class SecondFragment extends Fragment {
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 intent.setType("application/pdf");
 
-                startActivityForResult(intent, PICK_FILE);
+                startActivityForResult(intent, PICK_FILE_DOM);
             }
         });
 
-        view.findViewById(R.id.button_save).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.att_work).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("application/pdf");
 
-                Editable profil_name = ((EditText) fragmentView.findViewById(R.id.editTextTextPersonName)).getText();
-                if(null != profil_name){ ((MainActivity)getActivity()).setProfilName(profil_name.toString());}
-
-                Editable profil_first_name = ((EditText) fragmentView.findViewById(R.id.editTextTextPersonName2)).getText();
-                if(null != profil_first_name){ ((MainActivity)getActivity()).setProfilFirstName(profil_first_name.toString());}
-
-                Editable profil_birth_date = ((EditText) fragmentView.findViewById(R.id.editTextDate)).getText();
-                if(null != profil_birth_date){ ((MainActivity)getActivity()).setProfilBirthDate(profil_birth_date.toString());}
-
-                Editable profil_birth_location = ((EditText) fragmentView.findViewById(R.id.editTextBirthPlace)).getText();
-                if(null != profil_birth_location){ ((MainActivity)getActivity()).setProfilBirthLocation(profil_birth_location.toString());}
-
-                Editable profil_address = ((EditText) fragmentView.findViewById(R.id.editTextTextPostalAddress2)).getText();
-                if(null != profil_address){ ((MainActivity)getActivity()).setProfilAddress(profil_address.toString());}
-
-                Editable profil_post_code = ((EditText) fragmentView.findViewById(R.id.editTextCP)).getText();
-                if(null != profil_post_code){ ((MainActivity)getActivity()).setProfilPostCode(profil_post_code.toString());}
-
-                Editable profil_city = ((EditText) fragmentView.findViewById(R.id.editTextCity)).getText();
-                if(null != profil_city){ ((MainActivity)getActivity()).setProfilCity(profil_city.toString());}
-
-
-                ((MainActivity)getActivity()).saveProfil();
-
-
+                startActivityForResult(intent, PICK_FILE_WORK);
             }
         });
+
+        view.findViewById(R.id.att_creche).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("application/pdf");
+
+                startActivityForResult(intent, PICK_FILE_CRECHE);
+            }
+        });
+
+        view.findViewById(R.id.att_ecole).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("application/pdf");
+
+                startActivityForResult(intent, PICK_FILE_ECOLE);
+            }
+        });
+
+
+
 
     }
 }

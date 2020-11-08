@@ -126,41 +126,47 @@
         app:layout_constraintTop_toTopOf="@+id/editTextCP" />
 
     <ImageButton
-        android:id="@+id/button_save"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_marginTop="32dp"
+        android:id="@+id/attestation_dom"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
         android:background="@drawable/roundedbutton"
-        android:scaleType="centerInside"
-        android:scaleX="2"
-        android:scaleY="2"
-        android:src="@drawable/ic_baseline_save_alt_24"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/attestation_dom" />
-
-    <ImageView
-        android:id="@+id/imageView4"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
         android:src="@drawable/ic_noun_attestation_824051"
-        app:layout_constraintBottom_toBottomOf="@+id/attestation_dom"
-        app:layout_constraintEnd_toEndOf="@+id/imageView3"
         app:layout_constraintStart_toStartOf="@+id/imageView3"
+        app:layout_constraintTop_toBottomOf="@+id/editTextCP" />
+
+    <ImageButton
+        android:id="@+id/att_work"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="32dp"
+        android:background="@drawable/roundedbutton"
+        android:src="@drawable/ic_att_travail"
+        app:layout_constraintBottom_toBottomOf="@+id/attestation_dom"
+        app:layout_constraintStart_toEndOf="@+id/attestation_dom"
         app:layout_constraintTop_toTopOf="@+id/attestation_dom" />
 
-    <Button
-        android:id="@+id/attestation_dom"
-        android:layout_width="256dp"
-        android:layout_height="44dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:background="@color/cardview_dark_background"
-        android:foregroundTint="#FFFFFF"
-        android:text="None"
-        app:iconTint="@color/cardview_dark_background"
-        app:layout_constraintStart_toEndOf="@+id/imageView4"
-        app:layout_constraintTop_toBottomOf="@+id/editTextCity"
-        app:rippleColor="@color/cardview_dark_background" />
+    <ImageButton
+        android:id="@+id/att_creche"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="32dp"
+        android:background="@drawable/roundedbutton"
+        android:src="@drawable/ic_att_creche"
+        app:layout_constraintBottom_toBottomOf="@+id/att_work"
+        app:layout_constraintStart_toEndOf="@+id/att_work"
+        app:layout_constraintTop_toTopOf="@+id/att_work" />
+
+    <ImageButton
+        android:id="@+id/att_ecole"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="32dp"
+        android:background="@drawable/roundedbutton"
+        android:src="@drawable/ic_att_ecole"
+        app:layout_constraintBottom_toBottomOf="@+id/att_creche"
+        app:layout_constraintStart_toEndOf="@+id/att_creche"
+        app:layout_constraintTop_toTopOf="@+id/att_creche" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
