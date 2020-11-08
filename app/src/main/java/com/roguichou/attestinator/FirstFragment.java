@@ -27,6 +27,8 @@ public class FirstFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        ((MainActivity)getActivity()).setActionBarTitle("Attestation-inator");
+
         view.findViewById(R.id.button_profil).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

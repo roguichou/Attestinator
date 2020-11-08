@@ -69,6 +69,8 @@ public class AfficherFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        ((MainActivity)getActivity()).setActionBarTitle("Attestation");
+
         image = view.findViewById(R.id.pdf_renderer);
 
         String fichier = getArguments().getString("fichier");

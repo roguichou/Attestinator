@@ -4,24 +4,33 @@ import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.location.Location;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.WindowManager;
+import android.view.WindowMetrics;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.NavigationUI;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.zxing.WriterException;
 import com.tom_roush.pdfbox.io.RandomAccessBufferedFileInputStream;
 import com.tom_roush.pdfbox.pdfparser.PDFParser;
@@ -36,29 +45,11 @@ import com.tom_roush.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import com.tom_roush.pdfbox.util.Matrix;
 import com.tom_roush.pdfbox.util.PDFBoxResourceLoader;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import android.util.Log;
-import android.view.Display;
-import android.view.View;
-
-import android.view.Menu;
-import android.view.MenuItem;
-
-import android.content.Intent;
-import android.view.WindowManager;
-import android.view.WindowMetrics;
-
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 import androidmads.library.qrgenearator.QRGContents;
@@ -116,6 +107,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        NavController navigationController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        return navigationController.navigateUp();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,6 +122,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        NavController navigationController  = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavigationUI.setupActionBarWithNavController(this, navigationController);
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         settings = getPreferences(Context.MODE_PRIVATE);
@@ -173,6 +173,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    public void setActionBarTitle(String title) {
+        getSupportActionBar().setTitle(title);
+    }
 
     public FusedLocationProviderClient getFusedLocationClient(){
         return fusedLocationClient;
@@ -395,9 +399,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         try {
-            if (null != input) {
                 input.close();
-            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }

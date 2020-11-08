@@ -75,6 +75,7 @@ public class SecondFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        ((MainActivity)getActivity()).setActionBarTitle("Profil");
         fragmentView = view;
 
         String profil_name = ((MainActivity)getActivity()).getProfilName();
@@ -116,14 +117,6 @@ public class SecondFragment extends Fragment {
                 intent.setType("application/pdf");
 
                 startActivityForResult(intent, PICK_FILE);
-            }
-        });
-
-        view.findViewById(R.id.button_back).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NavHostFragment.findNavController(SecondFragment.this)
-                        .navigate(R.id.action_SecondFragment_to_FirstFragment);
             }
         });
 

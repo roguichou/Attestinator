@@ -36,6 +36,8 @@ public class NewAttFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        ((MainActivity)getActivity()).setActionBarTitle("Générer attestation");
+
         picker=(TimePicker)view.findViewById(R.id.timePicker1);
         picker.setIs24HourView(true);
 
