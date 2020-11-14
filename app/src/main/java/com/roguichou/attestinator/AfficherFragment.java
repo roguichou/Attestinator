@@ -1,6 +1,7 @@
 package com.roguichou.attestinator;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
@@ -43,31 +44,50 @@ public class AfficherFragment extends Fragment {
         image = view.findViewById(R.id.pdf_renderer);
 
         String fichier = getArguments().getString("fichier");
+        int type = getArguments().getInt("type");
 
-        if( null == fichier)
+        switch (type)
         {
-            view.setBackgroundColor(Color.BLACK);
-            image.setImageBitmap(((MainActivity)getActivity()).getQrBitmap());
-        }
-        else {
-            view.setBackgroundColor(Color.WHITE);
+            case 0xFF:
+                view.setBackgroundColor(Color.BLACK);
+                image.setImageBitmap(((MainActivity)getActivity()).getQrBitmap());
+                break;
 
-            try {
+            case AttestationPermanente.FILE_TYPE_PDF:
+                view.setBackgroundColor(Color.WHITE);
+                try {
+                    File attestation = new File(getActivity().getFilesDir() + "/" + fichier);
+                    ParcelFileDescriptor fd =	ParcelFileDescriptor.open(attestation,ParcelFileDescriptor.MODE_READ_ONLY);
+                    PdfRenderer renderer =new PdfRenderer(fd);
+                    PdfRenderer.Page page = renderer.openPage(0);
+                    Bitmap bitmap = Bitmap.createBitmap(page.getWidth(), page.getHeight(), Bitmap.Config.ARGB_8888);
+                    page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+                    image.setImageBitmap(bitmap);
+                    page.close();
+                    fd.close();
+                } catch (Exception e) {
+                    Snackbar mySnackbar = Snackbar.make(view, "Erreur à l'ouverture du fichier " + e.toString(), Snackbar.LENGTH_SHORT);
+                    mySnackbar.show();
+                }
+                break;
+
+            case AttestationPermanente.FILE_TYPE_JPG:
+                view.setBackgroundColor(Color.BLACK);
+
                 File attestation = new File(getActivity().getFilesDir() + "/" + fichier);
-                ParcelFileDescriptor fd =	ParcelFileDescriptor.open(attestation,ParcelFileDescriptor.MODE_READ_ONLY);
-                PdfRenderer renderer =new PdfRenderer(fd);
-                PdfRenderer.Page page = renderer.openPage(0);
-                Bitmap bitmap = Bitmap.createBitmap(page.getWidth(), page.getHeight(), Bitmap.Config.ARGB_8888);
-                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
-                image.setImageBitmap(bitmap);
-                page.close();
-                fd.close();
-            } catch (Exception e) {
-                Snackbar mySnackbar = Snackbar.make(view, "Erreur à l'ouverture du fichier " + e.toString(), Snackbar.LENGTH_SHORT);
-                mySnackbar.show();
-            }
-        }
 
+                BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+                Bitmap bitmap = BitmapFactory.decodeFile(attestation.getAbsolutePath(),bmOptions);
+                //bitmap = Bitmap.createScaledBitmap(bitmap, view.getWidth(),view.getHeight(),true);
+
+                image.setImageBitmap(bitmap);
+                break;
+
+            default:
+                Snackbar mySnackbar = Snackbar.make(view, "Type iconnu ???", Snackbar.LENGTH_SHORT);
+                mySnackbar.show();
+                break;
+        }
 
 
     }

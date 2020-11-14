@@ -35,7 +35,7 @@ public class NewAttFragment extends Fragment {
 
         ((MainActivity)getActivity()).setActionBarTitle("Générer attestation");
 
-        picker=(TimePicker)view.findViewById(R.id.timePicker1);
+        picker=view.findViewById(R.id.timePicker1);
         picker.setIs24HourView(true);
 
         fragmentView = view;
@@ -105,7 +105,7 @@ public class NewAttFragment extends Fragment {
                 ((MainActivity)getActivity()).genererAttestation(fragmentView, raison, picker.getHour(), picker.getMinute());
 
                 if (raison == Raison.SPORT_ANIMAUX) {
-                    ((MainActivity)getActivity()).debuterSortie ();
+                    ((MainActivity)getActivity()).debuterSortie (fragmentView);
                 }
 
 

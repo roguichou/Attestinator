@@ -17,6 +17,7 @@ import android.view.WindowManager;
 import android.view.WindowMetrics;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -45,18 +46,31 @@ import com.tom_roush.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import com.tom_roush.pdfbox.util.Matrix;
 import com.tom_roush.pdfbox.util.PDFBoxResourceLoader;
 
+import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Vector;
 
 import androidmads.library.qrgenearator.QRGContents;
 import androidmads.library.qrgenearator.QRGEncoder;
 
 public class MainActivity extends AppCompatActivity {
+    //clé requête de permission
+    private static final int REQUEST_CODE_PERM = 0xC00;
 
+
+
+    private FusedLocationProviderClient fusedLocationClient;
+    private LocationRequest locationRequest;
+    private LocationCallback locationCallback;
+
+
+    //clé de Préférences
+    //Profil
     private static final String KEY_NAME = "nom";
     private static final String KEY_FIRST_NAME = "prenom";
     private static final String KEY_BIRTH_DATE = "date_naiss";
@@ -64,11 +78,20 @@ public class MainActivity extends AppCompatActivity {
     private static final String KEY_ADD = "addresse";
     private static final String KEY_POST_CODE = "code_postal";
     private static final String KEY_CITY = "ville";
+    //attestations permanentes
+    private static final String KEY_NB_ATT_PERM = "nb_att";
+    private static final String KEY_ROOT_ATT_TYPE = "att_type_";
+    private static final String KEY_ROOT_FILE_TYPE = "file_type_";
+    private static final String KEY_ROOT_LABEL = "label_";
+
+    // dernière attestation
     private static final String KEY_RAISON = "raison";
     private static final String KEY_H = "heure";
     private static final String KEY_MIN = "min";
 
-    private static final int REQUEST_CODE_PERM_LOC = 0x753;
+
+    //Préférences
+    private SharedPreferences settings;
 
     private String profil_name = null;
     private String profil_first_name = null;
@@ -78,21 +101,16 @@ public class MainActivity extends AppCompatActivity {
     private String profil_post_code = null;
     private String profil_city = null;
 
-
-    private SharedPreferences settings;
-
-    protected MyApp mMyApp;
-
-    private FusedLocationProviderClient fusedLocationClient;
-    private LocationRequest locationRequest;
-    private LocationCallback locationCallback;
+    private Vector<AttestationPermanente> attestations;
 
     private Calendar heureSortie = null;
-    private Location home = null;
-
     private Raison raison = null;
-    Bitmap qrBitmap = null;
 
+
+
+    protected MyApp mMyApp;
+    Bitmap qrBitmap = null;
+    private Location home = null;
     public static final String CHANNEL_ID = "SortieServiceChannel";
 
 
@@ -113,6 +131,17 @@ public class MainActivity extends AppCompatActivity {
         return navigationController.navigateUp();
     }
 
+    public void setActionBarTitle(String title) {
+        ActionBar app = getSupportActionBar();
+        if(null != app) {
+            app.setTitle(title);
+        }
+    }
+
+    public FusedLocationProviderClient getFusedLocationClient(){
+        return fusedLocationClient;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,142 +157,40 @@ public class MainActivity extends AppCompatActivity {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        settings = getPreferences(Context.MODE_PRIVATE);
-        profil_name = settings.getString(KEY_NAME, null);
-        profil_first_name = settings.getString(KEY_FIRST_NAME, null);
-        profil_birth_date = settings.getString(KEY_BIRTH_DATE, null);
-        profil_birth_location = settings.getString(KEY_BIRTH_LOCATION, null);
-        profil_address = settings.getString(KEY_ADD, null);
-        profil_post_code = settings.getString(KEY_POST_CODE, null);
-        profil_city = settings.getString(KEY_CITY, null);
+        initiateSettings();
 
-
-        String raison_s = settings.getString(KEY_RAISON, null);
-        if(null!= raison_s) {
-            raison = Raison.fromString(raison_s);
-
-            int h = settings.getInt(KEY_H, 0);
-            int min = settings.getInt(KEY_MIN, 0);
-            heureSortie = Calendar.getInstance();
-            heureSortie.set(Calendar.HOUR_OF_DAY, h);
-            heureSortie.set(Calendar.MINUTE, min);
-
-
-            genererQRcode(null);
-        }
         PDFBoxResourceLoader.init(getApplicationContext());
 
         createNotificationChannel();
+
+
+        //permissions
+        ArrayList<String> params = new ArrayList<>();
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            params.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+        {
+            params.add(Manifest.permission.CAMERA);
+        }
+        if(params.size()>0) {
+            ActivityCompat.requestPermissions(this, (String[]) params.toArray(), REQUEST_CODE_PERM);
+        }
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    public boolean isProfilFull()
-    {
-        return (null!=profil_name &&
-                null!=profil_first_name &&
-                null!=profil_birth_date &&
-                null!=profil_birth_location &&
-                null!=profil_address &&
-                null!=profil_post_code &&
-                null!=profil_city );
-
-    }
-
-
-    public void setActionBarTitle(String title) {
-        getSupportActionBar().setTitle(title);
-    }
-
-    public FusedLocationProviderClient getFusedLocationClient(){
-        return fusedLocationClient;
-    }
-
-    public String getProfilName() {
-        return profil_name;
-    }
-
-    public String getProfilFirstName() {
-        return profil_first_name;
-    }
-
-    public String getProfilBirthDate() {
-        return profil_birth_date;
-    }
-
-    public String getProfilBirthLocation() {
-        return profil_birth_location;
-    }
-
-    public String getProfilAddress() {
-        return profil_address;
-    }
-
-    public String getProfilPostCode() {
-        return profil_post_code;
-    }
-
-    public String getProfilCity() {
-        return profil_city;
-    }
-
-
-    public Calendar getHeureSortie() {
-        return heureSortie;
-    }
-    public Location getHome(){
-        return home;
-    }
-
-    public void setProfilName(String _val) {
-        profil_name = _val;
-    }
-
-    public void setProfilFirstName(String _val) {
-        profil_first_name = _val;
-    }
-
-    public void setProfilBirthDate(String _val) {
-        profil_birth_date = _val;
-    }
-
-    public void setProfilBirthLocation(String _val) {
-        profil_birth_location = _val;
-    }
-
-    public void setProfilAddress(String _val) {
-        profil_address = _val;
-    }
-
-    public void setProfilPostCode(String _val) {
-        profil_post_code = _val;
-    }
-
-    public void setProfilCity(String _val) {
-        profil_city = _val;
-    }
 
     public Bitmap getQrBitmap() {
         return qrBitmap;
     }
 
-    public void saveProfil() {
-        SharedPreferences.Editor editor;
-
-        editor = settings.edit();
-        editor.putString(KEY_NAME, profil_name);
-        editor.putString(KEY_FIRST_NAME, profil_first_name);
-        editor.putString(KEY_BIRTH_DATE, profil_birth_date);
-        editor.putString(KEY_BIRTH_LOCATION, profil_birth_location);
-        editor.putString(KEY_ADD, profil_address);
-        editor.putString(KEY_POST_CODE, profil_post_code);
-        editor.putString(KEY_CITY, profil_city);
-
-        editor.apply();
-    }
 
     private String getTimeAsString()
     {
@@ -392,17 +319,12 @@ public class MainActivity extends AppCompatActivity {
 
         try (FileOutputStream fos = getApplicationContext().openFileOutput("attestation.pdf", Context.MODE_PRIVATE)) {
             doc.save(fos);
+            doc.close();
+            input.close();
         } catch (Exception e) {
             Snackbar mySnackbar = Snackbar.make(view, "Erreur à l'écriture du PDF " + e.toString(), Snackbar.LENGTH_SHORT);
             mySnackbar.show();
             return;
-        }
-
-        try {
-                input.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
         Snackbar mySnackbar = Snackbar.make(view, "Attestation générée", Snackbar.LENGTH_SHORT);
@@ -415,49 +337,12 @@ public class MainActivity extends AppCompatActivity {
         heureSortie.set(Calendar.HOUR_OF_DAY, h);
         heureSortie.set(Calendar.MINUTE, min);
 
-        SharedPreferences.Editor editor;
-        editor = settings.edit();
-        editor.putString(KEY_RAISON, raison.toString());
-        editor.putInt(KEY_H, h);
-        editor.putInt(KEY_MIN, min);
-        editor.apply();
+        save_attestation_temporaire(h, min);
 
         genererQRcode(view);
         genererPDF(view);
     }
 
-
-
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
-    {
-        /*@param requestCode The request code passed in {@link #requestPermissions(
-         * android.app.Activity, String[], int)}
-         * @param permissions The requested permissions. Never null.
-         * @param grantResults The grant results for the corresponding permissions
-         *     which is either {@link android.content.pm.PackageManager#PERMISSION_GRANTED}
-         *     or {@link android.content.pm.PackageManager#PERMISSION_DENIED}. Never null.*/
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-        {
-            locationCallback = new LocationCallback() {
-                @Override
-                public void onLocationResult(LocationResult locationResult) {
-                    if (locationResult == null) {
-                        return;
-                    }
-                    for (Location location : locationResult.getLocations()) {
-                        if (location != null) {
-                            home = location;
-                            fusedLocationClient.removeLocationUpdates(locationCallback);
-                            demarrerService();
-                        }
-                    }
-                }
-            };
-            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
-        }
-    }
 
     private void demarrerService()
     {
@@ -465,40 +350,221 @@ public class MainActivity extends AppCompatActivity {
                 new Intent(this, SortieService.class));
     }
 
-    public void debuterSortie() {
+    public void debuterSortie(View view) {
 
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(5 * 1000);
 
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_PERM_LOC);
-        }
-        else
-        {
-
-            locationCallback = new LocationCallback() {
+        locationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
-                    if (locationResult == null) {
-                        return;
-                    }
-                    for (Location location : locationResult.getLocations()) {
-                        if (location != null) {
-                            home = location;
-                            Log.d("ATTESTINATOR", "home:"+home.toString());
-                            demarrerService();
-                            fusedLocationClient.removeLocationUpdates(locationCallback);
-
-                        }
+                for (Location location : locationResult.getLocations()) {
+                    if (location != null) {
+                        home = location;
+                        Log.d("ATTESTINATOR", "home:"+home.toString());
+                        demarrerService();
+                        fusedLocationClient.removeLocationUpdates(locationCallback);
                     }
                 }
-            };
+            }
+        };
 
+        try
+        {
             fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
         }
+        catch (SecurityException e)
+        {
+            Snackbar mySnackbar = Snackbar.make(view, "Erreur: pas d'autorisation de localisation", Snackbar.LENGTH_SHORT);
+            mySnackbar.show();
+        }
+
+
     }
+
+
+
+
+
+
+
+    //settings
+
+    private void initiateSettings()
+    {
+        settings = getPreferences(Context.MODE_PRIVATE);
+        profil_name = settings.getString(KEY_NAME, null);
+        profil_first_name = settings.getString(KEY_FIRST_NAME, null);
+        profil_birth_date = settings.getString(KEY_BIRTH_DATE, null);
+        profil_birth_location = settings.getString(KEY_BIRTH_LOCATION, null);
+        profil_address = settings.getString(KEY_ADD, null);
+        profil_post_code = settings.getString(KEY_POST_CODE, null);
+        profil_city = settings.getString(KEY_CITY, null);
+
+        String raison_s = settings.getString(KEY_RAISON, null);
+        if(null!= raison_s) {
+            raison = Raison.fromString(raison_s);
+
+            int h = settings.getInt(KEY_H, 0);
+            int min = settings.getInt(KEY_MIN, 0);
+            heureSortie = Calendar.getInstance();
+            heureSortie.set(Calendar.HOUR_OF_DAY, h);
+            heureSortie.set(Calendar.MINUTE, min);
+
+            genererQRcode(null);
+        }
+
+        attestations = new Vector<>();
+
+        int nb_att = settings.getInt(KEY_NB_ATT_PERM, 0);
+        for (int i=0; i<nb_att; i++)
+        {
+            int att_type = settings.getInt(KEY_ROOT_ATT_TYPE+i,0);
+            int file_type = settings.getInt(KEY_ROOT_FILE_TYPE+i,0);
+            String label = settings.getString(KEY_ROOT_LABEL+i, null);
+            AttestationPermanente attestation = new AttestationPermanente(att_type, file_type, label);
+            attestations.add(attestation);
+        }
+    }
+
+    public Vector<AttestationPermanente> getPermanentAttestations() {
+        return attestations;
+    }
+
+    void addAttestation(AttestationPermanente att)
+    {
+        attestations.add(att);
+        int id = attestations.size()-1;
+        SharedPreferences.Editor editor;
+        editor = settings.edit();
+
+        editor.putInt(KEY_ROOT_ATT_TYPE+id, att.getAttestationType());
+        editor.putInt(KEY_ROOT_FILE_TYPE+id, att.getFileType());
+        editor.putString(KEY_ROOT_LABEL+id, att.getLabel());
+
+        editor.putInt(KEY_NB_ATT_PERM, attestations.size());
+
+        editor.apply();
+    }
+
+    void removeAttestation(int idx)
+    {
+        AttestationPermanente attestation = attestations.remove(idx);
+
+        File f = new File(getFilesDir()+"/"+attestation.getFilename());
+        f.delete();
+        SharedPreferences.Editor editor;
+        editor = settings.edit();
+        int nb_att = attestations.size();
+        editor.putInt(KEY_NB_ATT_PERM, nb_att);
+        for (int i=0; i<nb_att; i++)
+        {
+            AttestationPermanente att = attestations.get(i);
+            editor.putInt(KEY_ROOT_ATT_TYPE+i, att.getAttestationType());
+            editor.putInt(KEY_ROOT_FILE_TYPE+i, att.getFileType());
+            editor.putString(KEY_ROOT_LABEL+i, att.getLabel());
+        }
+        editor.apply();
+    }
+
+    private void save_attestation_temporaire(int h, int min) {
+        SharedPreferences.Editor editor;
+        editor = settings.edit();
+        editor.putString(KEY_RAISON, raison.toString());
+        editor.putInt(KEY_H, h);
+        editor.putInt(KEY_MIN, min);
+        editor.apply();
+    }
+
+    public boolean isProfilFull()
+    {
+        return (null!=profil_name &&
+                null!=profil_first_name &&
+                null!=profil_birth_date &&
+                null!=profil_birth_location &&
+                null!=profil_address &&
+                null!=profil_post_code &&
+                null!=profil_city );
+
+    }
+
+    public String getProfilName() {
+        return profil_name;
+    }
+
+    public String getProfilFirstName() {
+        return profil_first_name;
+    }
+
+    public String getProfilBirthDate() {
+        return profil_birth_date;
+    }
+
+    public String getProfilBirthLocation() {
+        return profil_birth_location;
+    }
+
+    public String getProfilAddress() {
+        return profil_address;
+    }
+
+    public String getProfilPostCode() {
+        return profil_post_code;
+    }
+
+    public String getProfilCity() {
+        return profil_city;
+    }
+
+
+    public Calendar getHeureSortie() {
+        return heureSortie;
+    }
+    public Location getHome(){
+        return home;
+    }
+
+    public void setProfilName(String _val) {
+        profil_name = _val;
+    }
+
+    public void setProfilFirstName(String _val) {
+        profil_first_name = _val;
+    }
+
+    public void setProfilBirthDate(String _val) {
+        profil_birth_date = _val;
+    }
+
+    public void setProfilBirthLocation(String _val) {
+        profil_birth_location = _val;
+    }
+
+    public void setProfilAddress(String _val) {
+        profil_address = _val;
+    }
+
+    public void setProfilPostCode(String _val) {
+        profil_post_code = _val;
+    }
+
+    public void setProfilCity(String _val) {
+        profil_city = _val;
+    }
+
+    public void saveProfil() {
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString(KEY_NAME, profil_name);
+        editor.putString(KEY_FIRST_NAME, profil_first_name);
+        editor.putString(KEY_BIRTH_DATE, profil_birth_date);
+        editor.putString(KEY_BIRTH_LOCATION, profil_birth_location);
+        editor.putString(KEY_ADD, profil_address);
+        editor.putString(KEY_POST_CODE, profil_post_code);
+        editor.putString(KEY_CITY, profil_city);
+
+        editor.apply();
+    }
+
 }

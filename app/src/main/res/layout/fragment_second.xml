@@ -11,7 +11,7 @@
         android:id="@+id/imageView"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:layout_marginStart="32dp"
+        android:layout_marginStart="24dp"
         android:layout_marginTop="32dp"
         android:contentDescription="@string/identit"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,7 +20,7 @@
 
     <EditText
         android:id="@+id/editTextTextPersonName"
-        android:layout_width="256dp"
+        android:layout_width="288dp"
         android:layout_height="44dp"
         android:layout_marginStart="8dp"
         android:autofillHints=""
@@ -33,7 +33,7 @@
 
     <EditText
         android:id="@+id/editTextTextPersonName2"
-        android:layout_width="256dp"
+        android:layout_width="288dp"
         android:layout_height="44dp"
         android:layout_marginTop="8dp"
         android:autofillHints=""
@@ -56,7 +56,7 @@
 
     <EditText
         android:id="@+id/editTextDate"
-        android:layout_width="256dp"
+        android:layout_width="288dp"
         android:layout_height="44dp"
         android:layout_marginTop="8dp"
         android:autofillHints=""
@@ -68,7 +68,7 @@
 
     <EditText
         android:id="@+id/editTextBirthPlace"
-        android:layout_width="256dp"
+        android:layout_width="288dp"
         android:layout_height="44dp"
         android:layout_marginTop="8dp"
         android:autofillHints=""
@@ -91,16 +91,16 @@
 
     <EditText
         android:id="@+id/editTextTextPostalAddress2"
-        android:layout_width="256dp"
+        android:layout_width="288dp"
         android:layout_height="44dp"
         android:layout_marginTop="8dp"
+        android:autofillHints=""
         android:ems="10"
         android:hint="@string/adresse"
         android:inputType="textPostalAddress"
         app:layout_constraintEnd_toEndOf="@+id/editTextBirthPlace"
         app:layout_constraintStart_toStartOf="@+id/editTextBirthPlace"
-        app:layout_constraintTop_toBottomOf="@+id/editTextBirthPlace"
-        android:autofillHints="" />
+        app:layout_constraintTop_toBottomOf="@+id/editTextBirthPlace" />
 
     <EditText
         android:id="@+id/editTextCP"
@@ -118,7 +118,7 @@
 
     <EditText
         android:id="@+id/editTextCity"
-        android:layout_width="152dp"
+        android:layout_width="184dp"
         android:layout_height="44dp"
         android:layout_marginStart="8dp"
         android:autofillHints="postalAddress"
@@ -129,52 +129,112 @@
         app:layout_constraintStart_toEndOf="@+id/editTextCP"
         app:layout_constraintTop_toTopOf="@+id/editTextCP" />
 
-    <ImageButton
-        android:id="@+id/attestation_dom"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="8dp"
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_marginTop="16dp"
-        android:background="@drawable/roundedbutton"
-        android:contentDescription="@string/domicile"
-        android:src="@drawable/ic_noun_attestation_824051"
+        android:src="@drawable/ic_add_att"
         app:layout_constraintStart_toStartOf="@+id/imageView3"
         app:layout_constraintTop_toBottomOf="@+id/editTextCP" />
 
-    <ImageButton
-        android:id="@+id/att_work"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="32dp"
-        android:background="@drawable/roundedbutton"
-        android:contentDescription="@string/work"
-        android:src="@drawable/ic_att_travail"
-        app:layout_constraintBottom_toBottomOf="@+id/attestation_dom"
-        app:layout_constraintStart_toEndOf="@+id/attestation_dom"
-        app:layout_constraintTop_toTopOf="@+id/attestation_dom" />
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView4"
+        app:layout_constraintStart_toEndOf="@+id/imageView4"
+        app:layout_constraintTop_toTopOf="@+id/imageView4" />
+
+    <EditText
+        android:id="@+id/label_att_perm"
+        android:layout_width="112dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:ems="10"
+        android:hint="@string/label"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toBottomOf="@+id/spinner"
+        app:layout_constraintStart_toEndOf="@+id/spinner"
+        app:layout_constraintTop_toTopOf="@+id/spinner" />
 
     <ImageButton
-        android:id="@+id/att_creche"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="32dp"
+        android:id="@+id/att_perm_browse"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="8dp"
         android:background="@drawable/roundedbutton"
-        android:contentDescription="@string/cr_che"
-        android:src="@drawable/ic_att_creche"
-        app:layout_constraintBottom_toBottomOf="@+id/att_work"
-        app:layout_constraintStart_toEndOf="@+id/att_work"
-        app:layout_constraintTop_toTopOf="@+id/att_work" />
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_baseline_folder_open_24"
+        app:layout_constraintBottom_toBottomOf="@+id/label_att_perm"
+        app:layout_constraintStart_toEndOf="@+id/label_att_perm"
+        app:layout_constraintTop_toTopOf="@+id/label_att_perm" />
 
     <ImageButton
-        android:id="@+id/att_ecole"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="32dp"
+        android:id="@+id/att_perm_photo"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="8dp"
         android:background="@drawable/roundedbutton"
-        android:contentDescription="@string/ecole"
-        android:src="@drawable/ic_att_ecole"
-        app:layout_constraintBottom_toBottomOf="@+id/att_creche"
-        app:layout_constraintStart_toEndOf="@+id/att_creche"
-        app:layout_constraintTop_toTopOf="@+id/att_creche" />
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_baseline_camera_alt_24"
+        app:layout_constraintBottom_toBottomOf="@+id/att_perm_browse"
+        app:layout_constraintStart_toEndOf="@+id/att_perm_browse"
+        app:layout_constraintTop_toTopOf="@+id/att_perm_browse" />
+
+    <View
+        android:id="@+id/divider6"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView4" />
+
+    <TableLayout
+        android:id="@+id/tableAttesations"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="40dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider6">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/imageView5"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_noun_attestation_824051" />
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:gravity="clip_horizontal|center"
+                android:paddingHorizontal="60dp"
+                android:paddingVertical="8dp"
+                android:text="" />
+
+            <ImageButton
+                android:id="@+id/button_del_att"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/roundedbutton"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_baseline_close_24" />
+        </TableRow>
+
+    </TableLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,38 +1,71 @@
 package com.roguichou.attestinator;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.FileUtils;
+import android.provider.MediaStore;
 import android.text.Editable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.snackbar.Snackbar;
+import com.roguichou.attestinator.iconspinner.CustomAdapter;
+import com.roguichou.attestinator.iconspinner.SpinnerModel;
 import com.tom_roush.pdfbox.io.RandomAccessBufferedFileInputStream;
 import com.tom_roush.pdfbox.pdfparser.PDFParser;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.Vector;
 
 
 //Profil
 public class SecondFragment extends Fragment {
 
+    static final int REQUEST_TAKE_PHOTO = 0x76;
 
     private  static final int PICK_FILE_DOM = 0xE1;
     private  static final int PICK_FILE_WORK = 0xE2;
     private  static final int PICK_FILE_CRECHE = 0xE3;
     private  static final int PICK_FILE_ECOLE = 0xE4;
+    private  static final int PICK_FILE_GENERIC = 0xE0;
 
+    public ArrayList<SpinnerModel> CustomListViewValuesArr = new ArrayList<>();
+    CustomAdapter adapter;
+    Spinner spinner;
 
     private View fragmentView = null;
+
 
 
     @Override
@@ -46,77 +79,178 @@ public class SecondFragment extends Fragment {
 
     @Override
     public void onPause() {
-
+        MainActivity activity = (MainActivity)getActivity();
+        if(null!=activity) {
             Editable profil_name = ((EditText) fragmentView.findViewById(R.id.editTextTextPersonName)).getText();
-            if(null != profil_name){ ((MainActivity)getActivity()).setProfilName(profil_name.toString());}
+            if (null != profil_name) {
+                activity.setProfilName(profil_name.toString());
+            }
 
             Editable profil_first_name = ((EditText) fragmentView.findViewById(R.id.editTextTextPersonName2)).getText();
-            if(null != profil_first_name){ ((MainActivity)getActivity()).setProfilFirstName(profil_first_name.toString());}
+            if (null != profil_first_name) {
+                activity.setProfilFirstName(profil_first_name.toString());
+            }
 
             Editable profil_birth_date = ((EditText) fragmentView.findViewById(R.id.editTextDate)).getText();
-            if(null != profil_birth_date){ ((MainActivity)getActivity()).setProfilBirthDate(profil_birth_date.toString());}
+            if (null != profil_birth_date) {
+                activity.setProfilBirthDate(profil_birth_date.toString());
+            }
 
             Editable profil_birth_location = ((EditText) fragmentView.findViewById(R.id.editTextBirthPlace)).getText();
-            if(null != profil_birth_location){ ((MainActivity)getActivity()).setProfilBirthLocation(profil_birth_location.toString());}
+            if (null != profil_birth_location) {
+                activity.setProfilBirthLocation(profil_birth_location.toString());
+            }
 
             Editable profil_address = ((EditText) fragmentView.findViewById(R.id.editTextTextPostalAddress2)).getText();
-            if(null != profil_address){ ((MainActivity)getActivity()).setProfilAddress(profil_address.toString());}
+            if (null != profil_address) {
+                activity.setProfilAddress(profil_address.toString());
+            }
 
             Editable profil_post_code = ((EditText) fragmentView.findViewById(R.id.editTextCP)).getText();
-            if(null != profil_post_code){ ((MainActivity)getActivity()).setProfilPostCode(profil_post_code.toString());}
+            if (null != profil_post_code) {
+                activity.setProfilPostCode(profil_post_code.toString());
+            }
 
             Editable profil_city = ((EditText) fragmentView.findViewById(R.id.editTextCity)).getText();
-            if(null != profil_city){ ((MainActivity)getActivity()).setProfilCity(profil_city.toString());}
+            if (null != profil_city) {
+                activity.setProfilCity(profil_city.toString());
+            }
 
 
-            ((MainActivity)getActivity()).saveProfil();
-
+            activity.saveProfil();
+        }
         super.onPause();
+    }
+
+
+    private void saveAttestationFile(Uri uri, String dest_fn)
+    {
+
+
+        File f = new File(getActivity().getFilesDir()+"/"+dest_fn);
+
+        try {
+            if (!f.exists())
+            {
+                f.createNewFile();
+            }
+
+            ContentResolver content = getContext().getContentResolver();
+            InputStream source = content.openInputStream(uri);
+
+            OutputStream destination = new FileOutputStream(f);
+            if (source != null) {
+                byte[] buffer = new byte[1000];
+                int bytesRead;
+                while ( ( bytesRead = source.read( buffer, 0, buffer.length ) ) >= 0 )
+                {
+                    destination.write( buffer, 0, bytesRead );
+                }
+            }
+            if (source != null) {
+                source.close();
+            }
+            destination.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
     public  void onActivityResult(int requestCode, int resultCode,
                                  Intent resultData) {
-        String fn = null;
-        if (resultCode == Activity.RESULT_OK ) {
-            switch (requestCode)
+
+        int fileType = AttestationPermanente.FILE_TYPE_JPG;
+        Uri uri = null;
+
+        if (resultCode == Activity.RESULT_OK)
+        {
+            if (PICK_FILE_GENERIC == requestCode && resultData != null)
             {
-                case PICK_FILE_DOM :
-                    fn="att_dom.pdf";
-                    break;
-                case PICK_FILE_WORK :
-                    fn="att_work.pdf";
-                    break;
-                case PICK_FILE_CRECHE :
-                    fn="att_creche.pdf";
-                    break;
-                case PICK_FILE_ECOLE :
-                    fn="att_ecole.pdf";
-                    break;
-            }
-            if (null!=fn && resultData != null) {
+                 uri = Uri.parse(resultData.getDataString());
+                String mime = getContext().getContentResolver().getType(uri);
 
-                Uri attestation_dom = resultData.getData();
-                try {
-                    InputStream inputStream = getContext().getContentResolver().openInputStream(attestation_dom);
-                    RandomAccessBufferedFileInputStream istream = new RandomAccessBufferedFileInputStream(inputStream);
-                    PDFParser parser = new PDFParser(istream);
-                    parser.parse();
-                    PDDocument doc = parser.getPDDocument();
-
-                    FileOutputStream fos = getContext().openFileOutput(fn, Context.MODE_PRIVATE);
-                    doc.save(fos);
-                    inputStream.close();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+                if (mime.contains("pdf"))
+                {
+                    fileType = AttestationPermanente.FILE_TYPE_PDF;
                 }
 
-
             }
+            else if(REQUEST_TAKE_PHOTO != requestCode)
+            {
+                return;
+            }
+
+
+            SpinnerModel model = (SpinnerModel)spinner.getSelectedItem();
+            AttestationPermanente attestation = new AttestationPermanente(model.getType(),
+                    fileType,
+                    ((TextView)fragmentView.findViewById(R.id.label_att_perm)).getText().toString());
+            if(null != uri) {
+                saveAttestationFile(uri, attestation.getFilename());
+            }
+            ((MainActivity)getActivity()).addAttestation(attestation);
+            rebuildTableAttestationPermanente();
         }
     }
 
+
+    private void rebuildTableAttestationPermanente() {
+
+        spinner.setSelection(0);
+       ((TextView)fragmentView.findViewById(R.id.label_att_perm)).setText("");
+
+        TableLayout table = (fragmentView.findViewById(R.id.tableAttesations));
+
+        //1. clear all rows
+        table.removeAllViews();
+
+        //2. create rows
+        Resources res = getResources();
+        Vector<AttestationPermanente> attestations = ((MainActivity)getActivity()).getPermanentAttestations();
+        for(int i=0;i<attestations.size();i++)
+        {
+            AttestationPermanente attestation = attestations.get(i);
+            TableRow row = (TableRow)LayoutInflater.from(getContext()).inflate(R.layout.profil_att_row, null);
+
+            //2.1 image
+            int type = attestation.getAttestationType();
+            String img = "ic_profile";
+            switch(type)
+            {
+                case AttestationPermanente.ATTESTATION_TYPE_HOME :
+                    img = "ic_noun_attestation_824051";
+                    break;
+                case AttestationPermanente.ATTESTATION_TYPE_WORK :
+                    img = "ic_att_travail";
+                    break;
+                case AttestationPermanente.ATTESTATION_TYPE_ECOLE :
+                    img = "ic_att_ecole";
+                    break;
+            }
+            ImageView image = (row.findViewById(R.id.type_att_img));
+            image.setImageResource(res.getIdentifier("com.roguichou.attestinator:drawable/"+ img,null,null));
+
+
+            //2.2 Label
+            TextView label = row.findViewById(R.id.label_att);
+            label.setText(attestation.getLabel());
+
+            //2.3 Delete Button
+            ImageButton button = (row.findViewById(R.id.button_del_att));
+            button.setTag(i);
+            button.setOnClickListener(v -> {
+                Integer idx = (Integer)v.getTag();
+                ((MainActivity) getActivity()).removeAttestation(idx);
+                rebuildTableAttestationPermanente();
+            });
+
+            table.addView(row);
+
+        }
+    }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -155,40 +289,79 @@ public class SecondFragment extends Fragment {
         }
 
 
-        view.findViewById(R.id.attestation_dom).setOnClickListener(view1 -> {
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("application/pdf");
+        //peupler le spinner d'attestations  permanentes
+        CustomListViewValuesArr.add(new SpinnerModel("sans", "ic_profile", AttestationPermanente.ATTESTATION_TYPE_UNKNOWN));
+        CustomListViewValuesArr.add(new SpinnerModel("domicile", "ic_home", AttestationPermanente.ATTESTATION_TYPE_HOME));
+        CustomListViewValuesArr.add(new SpinnerModel("travail", "ic_work", AttestationPermanente.ATTESTATION_TYPE_WORK));
+        CustomListViewValuesArr.add(new SpinnerModel("école", "ic_school", AttestationPermanente.ATTESTATION_TYPE_ECOLE));
 
-            startActivityForResult(intent, PICK_FILE_DOM);
+        // Create custom adapter object ( see below CustomAdapter.java )
+        adapter = new CustomAdapter(getContext(), R.layout.spinner_rows, CustomListViewValuesArr,getResources());
+        // Set adapter to spinner
+        spinner = view.findViewById(R.id.spinner);
+        spinner.setAdapter(adapter);
+
+
+        view.findViewById(R.id.att_perm_browse).setOnClickListener(view1->{
+            SpinnerModel model = (SpinnerModel)spinner.getSelectedItem();
+            if (model.getType()==AttestationPermanente.ATTESTATION_TYPE_UNKNOWN ||
+                    ((TextView)view.findViewById(R.id.label_att_perm)).length()<2  )
+            {
+                Snackbar mySnackbar = Snackbar.make(view, "Choisir type et label.", Snackbar.LENGTH_SHORT);
+                mySnackbar.show();
+            }
+            else
+            {
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+                String[] mimeTypes = {"image/*","application/pdf"};
+                intent.setType("*/*");
+                intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+
+                startActivityForResult(intent, PICK_FILE_GENERIC);
+            }
         });
 
-        view.findViewById(R.id.att_work).setOnClickListener(view12 -> {
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("application/pdf");
 
-            startActivityForResult(intent, PICK_FILE_WORK);
+        view.findViewById(R.id.att_perm_photo).setOnClickListener(view2-> {
+
+            SpinnerModel model = (SpinnerModel)spinner.getSelectedItem();
+            if (model.getType()==AttestationPermanente.ATTESTATION_TYPE_UNKNOWN ||
+                    ((TextView)view.findViewById(R.id.label_att_perm)).length()<2  )
+            {
+                Snackbar mySnackbar = Snackbar.make(view, "Choisir type et label.", Snackbar.LENGTH_SHORT);
+                mySnackbar.show();
+            }
+            else {
+                File photoFile = null;
+                try {
+                    photoFile = new File(getActivity().getFilesDir()+
+                            "/att_" + ((TextView) view.findViewById(R.id.label_att_perm)).getText()+
+                            ".jpg");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    // Continue only if the File was successfully created
+                    if (photoFile != null) {
+                        Uri photoURI = FileProvider.getUriForFile(getContext(),
+                                "com.roguichou.fileprovider",
+                                photoFile);
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                        startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                    }
+                }
+                else
+                {
+                    Snackbar mySnackbar = Snackbar.make(view, "Erreur: pas d'autorisation d'utilisation de l'appareil photo", Snackbar.LENGTH_SHORT);
+                    mySnackbar.show();
+                }
+            }
         });
 
-        view.findViewById(R.id.att_creche).setOnClickListener(view13 -> {
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("application/pdf");
-
-            startActivityForResult(intent, PICK_FILE_CRECHE);
-        });
-
-        view.findViewById(R.id.att_ecole).setOnClickListener(view14 -> {
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("application/pdf");
-
-            startActivityForResult(intent, PICK_FILE_ECOLE);
-        });
-
-
-
+        rebuildTableAttestationPermanente();
 
     }
 }

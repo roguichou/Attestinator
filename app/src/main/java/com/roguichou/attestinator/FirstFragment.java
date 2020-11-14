@@ -1,9 +1,15 @@
 package com.roguichou.attestinator;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -12,6 +18,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
+import java.util.Vector;
 
 public class FirstFragment extends Fragment {
 
@@ -50,6 +57,7 @@ public class FirstFragment extends Fragment {
             if (attestation.exists()) {
                 Bundle bundle = new Bundle();
                 bundle.putString("fichier", null);
+                bundle.putInt("type", 0xFF);
                 NavHostFragment.findNavController(FirstFragment.this)
                         .navigate(R.id.action_FirstFragment_to_afficherFragment, bundle);
             }
@@ -65,6 +73,7 @@ public class FirstFragment extends Fragment {
             if (attestation.exists()) {
                 Bundle bundle = new Bundle();
                 bundle.putString("fichier", "attestation.pdf");
+                bundle.putInt("type", AttestationPermanente.FILE_TYPE_PDF);
                 NavHostFragment.findNavController(FirstFragment.this)
                         .navigate(R.id.action_FirstFragment_to_afficherFragment, bundle);
             }
@@ -75,67 +84,100 @@ public class FirstFragment extends Fragment {
             }
         });
 
-        view.findViewById(R.id.button_show_home).setOnClickListener(view15 -> {
-            File attestation = new File(getActivity().getFilesDir()+"/att_dom.pdf");
-            if (attestation.exists()) {
-                Bundle bundle = new Bundle();
-                bundle.putString("fichier", "att_dom.pdf");
-                NavHostFragment.findNavController(FirstFragment.this)
-                        .navigate(R.id.action_FirstFragment_to_afficherFragment, bundle);
-            }
-            else
-            {
-                Snackbar mySnackbar = Snackbar.make(view, "Aucune attestation à afficher.", Snackbar.LENGTH_SHORT);
-                mySnackbar.show();
-            }
-        });
+        /* **********  Dynamically create buttons  ********** */
+        buildTableShowAttestationPermanente(view);
 
-
-        view.findViewById(R.id.button_show_work).setOnClickListener(view16 -> {
-            File attestation = new File(getActivity().getFilesDir()+"/att_work.pdf");
-            if (attestation.exists()) {
-                Bundle bundle = new Bundle();
-                bundle.putString("fichier", "att_work.pdf");
-                NavHostFragment.findNavController(FirstFragment.this)
-                        .navigate(R.id.action_FirstFragment_to_afficherFragment, bundle);
-            }
-            else
-            {
-                Snackbar mySnackbar = Snackbar.make(view, "Aucune attestation à afficher.", Snackbar.LENGTH_SHORT);
-                mySnackbar.show();
-            }
-        });
-
-
-        view.findViewById(R.id.button_show_creche).setOnClickListener(view17 -> {
-            File attestation = new File(getActivity().getFilesDir()+"/att_creche.pdf");
-            if (attestation.exists()) {
-                Bundle bundle = new Bundle();
-                bundle.putString("fichier", "att_creche.pdf");
-                NavHostFragment.findNavController(FirstFragment.this)
-                        .navigate(R.id.action_FirstFragment_to_afficherFragment, bundle);
-            }
-            else
-            {
-                Snackbar mySnackbar = Snackbar.make(view, "Aucune attestation à afficher.", Snackbar.LENGTH_SHORT);
-                mySnackbar.show();
-            }
-        });
-
-        view.findViewById(R.id.button_show_school).setOnClickListener(view18 -> {
-            File attestation = new File(getActivity().getFilesDir()+"/att_ecole.pdf");
-            if (attestation.exists()) {
-                Bundle bundle = new Bundle();
-                bundle.putString("fichier", "att_ecole.pdf");
-                NavHostFragment.findNavController(FirstFragment.this)
-                        .navigate(R.id.action_FirstFragment_to_afficherFragment, bundle);
-            }
-            else
-            {
-                Snackbar mySnackbar = Snackbar.make(view, "Aucune attestation à afficher.", Snackbar.LENGTH_SHORT);
-                mySnackbar.show();
-            }
-        });
 
     }
+
+
+    private void buildTableShowAttestationPermanente(View view)
+    {
+        TableLayout table = (view.findViewById(R.id.table_show_att));
+
+        //1. clear all rows
+        table.removeAllViews();
+
+        //2. create rows
+        Resources res = getResources();
+        Vector<AttestationPermanente> attestations = ((MainActivity)getActivity()).getPermanentAttestations();
+        TableRow row = null;
+        int col=0;
+
+        for (int i=0; i<attestations.size();i++)
+        {
+            TextView txt = null;
+            ImageButton but = null;
+            AttestationPermanente attestation = attestations.get(i);
+
+            switch (col)
+            {
+                case 0:
+                case 3:
+                    row = (TableRow)LayoutInflater.from(getContext()).inflate(R.layout.show_att_row, null);
+                    table.addView(row);
+                    txt = row.findViewById(R.id.label_att_1);
+                    but = row.findViewById(R.id.show_att_1);
+                    col = 0;
+                    break;
+                case 1:
+                    txt = row.findViewById(R.id.label_att_2);
+                    but = row.findViewById(R.id.show_att_2);
+                    break;
+                case 2:
+                    txt = row.findViewById(R.id.label_att_3);
+                    but = row.findViewById(R.id.show_att_3);
+                    break;
+            }
+
+            //Label
+            txt.setText(attestation.getLabel());
+
+            //button
+            int type = attestation.getAttestationType();
+            String img = "ic_profile";
+            switch(type)
+            {
+                case AttestationPermanente.ATTESTATION_TYPE_HOME :
+                    img = "ic_noun_attestation_824051";
+                    break;
+                case AttestationPermanente.ATTESTATION_TYPE_WORK :
+                    img = "ic_att_travail";
+                    break;
+                case AttestationPermanente.ATTESTATION_TYPE_ECOLE :
+                    img = "ic_att_ecole";
+                    break;
+            }
+
+            but.setImageResource(res.getIdentifier("com.roguichou.attestinator:drawable/"+ img,null,null));
+            but.setOnClickListener(view0 -> {
+                File att_fn = new File(getActivity().getFilesDir()+"/"+attestation.getFilename());
+                if (att_fn.exists()) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("fichier", attestation.getFilename());
+                    bundle.putInt("type", attestation.getFileType());
+                    NavHostFragment.findNavController(FirstFragment.this)
+                            .navigate(R.id.action_FirstFragment_to_afficherFragment, bundle);
+                }
+                else
+                {
+                    Snackbar mySnackbar = Snackbar.make(view, "Aucune attestation à afficher.", Snackbar.LENGTH_SHORT);
+                    mySnackbar.show();
+                }
+            });
+
+            col++;
+        }
+
+        switch (col)
+        {
+            case 1:
+                row.findViewById(R.id.show_att_2).setVisibility(View.INVISIBLE);
+                row.findViewById(R.id.label_att_2).setVisibility(View.INVISIBLE);
+            case 2:
+                row.findViewById(R.id.show_att_3).setVisibility(View.INVISIBLE);
+                row.findViewById(R.id.label_att_3).setVisibility(View.INVISIBLE);
+        }
+    }
+
 }
