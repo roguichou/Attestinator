@@ -41,4 +41,6 @@
     <string name="cr_che">Crèche</string>
     <string name="ecole">Ecole</string>
     <string name="adresse">Adresse</string>
+    <string name="show_attestation">Show Attestation</string>
+    <string name="label">Label</string>
 </resources>
