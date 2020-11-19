@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="credits">
+        &lt;big&gt;&lt;font color="#3f48cc"&gt;&lt;u&gt;Editeur&lt;/u&gt;&lt;/font&gt;&lt;/big&gt;&lt;br&gt;
+        Roguichou&lt;br&gt;
+        &lt;br&gt;
+        &lt;big&gt;&lt;font color="#3f48cc"&gt;&lt;u&gt;Contenu&lt;/u&gt;&lt;/font&gt;&lt;/big&gt;&lt;br&gt;
+        Utilisation du code du site: &lt;a href="www.interieur.gouv.fr"&gt;www.interieur.gouv.fr&lt;/a&gt;&lt;br&gt;
+        &lt;br&gt;
+        &lt;big&gt;&lt;font color="#3f48cc"&gt;&lt;u&gt;Icones:&lt;/u&gt;&lt;/font&gt;&lt;/big&gt;&lt;br&gt;
+        &lt;ul&gt;
+        &lt;li&gt;attestation by Vectors Market from the Noun Project&lt;/li&gt;
+        &lt;li&gt;Icons made by &lt;a href="https://www.flaticon.com/authors/bqlqn" title="bqlqn"&gt;bqlqn&lt;/a&gt; from &lt;a href="https://www.flaticon.com/" title="Flaticon"&gt;www.flaticon.com&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;Icons made by &lt;a href="https://www.flaticon.com/authors/pixel-perfect" title="Pixel perfect"&gt;Pixel perfect&lt;/a&gt; from &lt;a href="https://www.flaticon.com/" title="Flaticon"&gt;www.flaticon.com&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;Icons made by &lt;a href="https://www.flaticon.com/authors/freepik" title="Freepik"&gt;Freepik&lt;/a&gt; from &lt;a href="https://www.flaticon.com/" title="Flaticon"&gt;www.flaticon.com&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+    </string>
+</resources>

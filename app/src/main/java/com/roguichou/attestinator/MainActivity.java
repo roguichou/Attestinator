@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.WindowMetrics;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -48,6 +47,7 @@ import com.tom_roush.pdfbox.util.PDFBoxResourceLoader;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -65,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     private FusedLocationProviderClient fusedLocationClient;
-    private LocationRequest locationRequest;
     private LocationCallback locationCallback;
 
 
@@ -106,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
     private Calendar heureSortie = null;
     private Raison raison = null;
 
+    private Logger log;
 
 
     protected MyApp mMyApp;
@@ -157,7 +157,21 @@ public class MainActivity extends AppCompatActivity {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        String fn =getFilesDir()+"/log.csv";
+        try {
+            File file = new File(fn);
+            if (!file.exists())
+            {
+                file.createNewFile();
+            }
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        log = new Logger(fn, Logger.LOG_LEVEL_INFO);
         initiateSettings();
+
 
         PDFBoxResourceLoader.init(getApplicationContext());
 
@@ -176,7 +190,13 @@ public class MainActivity extends AppCompatActivity {
             params.add(Manifest.permission.CAMERA);
         }
         if(params.size()>0) {
-            ActivityCompat.requestPermissions(this, (String[]) params.toArray(), REQUEST_CODE_PERM);
+            String [] perms = new String[params.size()];
+            for(int i=0;i<params.size();i++)
+            {
+                perms[i] = params.get(i);
+            }
+
+            ActivityCompat.requestPermissions(this, perms, REQUEST_CODE_PERM);
         }
     }
 
@@ -352,7 +372,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void debuterSortie(View view) {
 
-        locationRequest = LocationRequest.create();
+        LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(5 * 1000);
 
@@ -525,6 +545,8 @@ public class MainActivity extends AppCompatActivity {
     public Location getHome(){
         return home;
     }
+
+    public Logger getLog(){return log;}
 
     public void setProfilName(String _val) {
         profil_name = _val;

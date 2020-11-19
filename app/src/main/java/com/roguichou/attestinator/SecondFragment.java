@@ -3,21 +3,16 @@ package com.roguichou.attestinator;
 import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.FileUtils;
 import android.provider.MediaStore;
 import android.text.Editable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -34,17 +29,11 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.snackbar.Snackbar;
 import com.roguichou.attestinator.iconspinner.CustomAdapter;
 import com.roguichou.attestinator.iconspinner.SpinnerModel;
-import com.tom_roush.pdfbox.io.RandomAccessBufferedFileInputStream;
-import com.tom_roush.pdfbox.pdfparser.PDFParser;
-import com.tom_roush.pdfbox.pdmodel.PDDocument;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -54,13 +43,9 @@ public class SecondFragment extends Fragment {
 
     static final int REQUEST_TAKE_PHOTO = 0x76;
 
-    private  static final int PICK_FILE_DOM = 0xE1;
-    private  static final int PICK_FILE_WORK = 0xE2;
-    private  static final int PICK_FILE_CRECHE = 0xE3;
-    private  static final int PICK_FILE_ECOLE = 0xE4;
     private  static final int PICK_FILE_GENERIC = 0xE0;
 
-    public ArrayList<SpinnerModel> CustomListViewValuesArr = new ArrayList<>();
+    public final ArrayList<SpinnerModel> CustomListViewValuesArr = new ArrayList<>();
     CustomAdapter adapter;
     Spinner spinner;
 
@@ -290,10 +275,10 @@ public class SecondFragment extends Fragment {
 
 
         //peupler le spinner d'attestations  permanentes
-        CustomListViewValuesArr.add(new SpinnerModel("sans", "ic_profile", AttestationPermanente.ATTESTATION_TYPE_UNKNOWN));
-        CustomListViewValuesArr.add(new SpinnerModel("domicile", "ic_home", AttestationPermanente.ATTESTATION_TYPE_HOME));
-        CustomListViewValuesArr.add(new SpinnerModel("travail", "ic_work", AttestationPermanente.ATTESTATION_TYPE_WORK));
-        CustomListViewValuesArr.add(new SpinnerModel("école", "ic_school", AttestationPermanente.ATTESTATION_TYPE_ECOLE));
+        CustomListViewValuesArr.add(new SpinnerModel("ic_profile", AttestationPermanente.ATTESTATION_TYPE_UNKNOWN));
+        CustomListViewValuesArr.add(new SpinnerModel("ic_home", AttestationPermanente.ATTESTATION_TYPE_HOME));
+        CustomListViewValuesArr.add(new SpinnerModel("ic_work", AttestationPermanente.ATTESTATION_TYPE_WORK));
+        CustomListViewValuesArr.add(new SpinnerModel("ic_school", AttestationPermanente.ATTESTATION_TYPE_ECOLE));
 
         // Create custom adapter object ( see below CustomAdapter.java )
         adapter = new CustomAdapter(getContext(), R.layout.spinner_rows, CustomListViewValuesArr,getResources());

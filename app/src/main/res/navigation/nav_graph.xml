@@ -19,6 +19,9 @@
         <action
             android:id="@+id/action_FirstFragment_to_afficherFragment"
             app:destination="@id/afficherFragment" />
+        <action
+            android:id="@+id/action_FirstFragment_to_aproposFragment"
+            app:destination="@id/aproposFragment" />
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
@@ -51,5 +54,14 @@
             app:argType="string"
             app:nullable="true"
             android:defaultValue="null" />
+    </fragment>
+    <fragment
+        android:id="@+id/aproposFragment"
+        android:name="com.roguichou.attestinator.AproposFragment"
+        android:label="fragment_apropos"
+        tools:layout="@layout/fragment_apropos" >
+        <action
+            android:id="@+id/action_aproposFragment_to_FirstFragment"
+            app:destination="@id/FirstFragment" />
     </fragment>
 </navigation>

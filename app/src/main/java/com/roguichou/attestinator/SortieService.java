@@ -126,7 +126,7 @@ public class SortieService extends Service {
                             Location home = currentActivity.getHome();
 
                             int dist = (int) location.distanceTo(home);
-                            //Log.d("ATTESTINATOR", "home:"+home.toString()+"loc:" + location.toString() + " dist=" + dist);
+                            currentActivity.getLog().log(Logger.LOG_INFO, "home:"+home.toString()+"loc:" + location.toString() + " dist=" + dist);
                             notificationLayout.setTextViewText(R.id.notif_dist_txt, String.format(Locale.FRENCH,"%d m", dist));
 
                             if (dist > 1000) {
@@ -168,18 +168,17 @@ public class SortieService extends Service {
             public static final String ACTION_RESTART = "Attestinator.restartTimer";
             @Override
             public void onReceive(Context context, Intent intent) {
-                MainActivity currentActivity;
-                //Log.d("Attestinator", "Button click received from notification");
+                MainActivity currentActivity = (MainActivity)((MyApp)context.getApplicationContext()).getCurrentActivity();
+                currentActivity.getLog().log(Logger.LOG_INFO, "Button click received from notification");
                 if (intent != null && intent.getAction() != null) {
                     switch (intent.getAction()) {
                         case ACTION_CLOSE:
-                            Log.d("Attestinator", "Close service request");
+                            currentActivity.getLog().log(Logger.LOG_INFO, "Close service request");
                             Intent serviceIntent = new Intent(context, SortieService.class);
                             context.stopService(serviceIntent);
                             break;
                         case ACTION_RESTART:
-                            Log.d("Attestinator", "Regenerate request" + context.toString());
-                            currentActivity = (MainActivity)((MyApp)context.getApplicationContext()).getCurrentActivity();
+                            currentActivity.getLog().log(Logger.LOG_INFO, "Regenerate request" + context.toString());
                             Calendar heure_sortie = currentActivity.getHeureSortie();
                             heure_sortie.add(Calendar.MINUTE, 30);
                             currentActivity.genererAttestation(currentActivity.findViewById(android.R.id.content), Raison.SPORT_ANIMAUX,

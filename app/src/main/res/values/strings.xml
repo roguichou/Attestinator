@@ -43,4 +43,8 @@
     <string name="adresse">Adresse</string>
     <string name="show_attestation">Show Attestation</string>
     <string name="label">Label</string>
+    <string name="a_propos">A propos</string>
+    <string name="gestion_d_attestations_de_sortiie">Gestion d\'attestations de sortie</string>
+    <string name="attestation_inator">Attestation-inator</string>
+    <string name="_169_roguichou_2020">&#169; 2020 by Roguichou</string>
 </resources>

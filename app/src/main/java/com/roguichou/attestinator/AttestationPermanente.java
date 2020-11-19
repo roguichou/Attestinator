@@ -9,10 +9,10 @@ public class AttestationPermanente {
     public static final int FILE_TYPE_PDF = 0x0;
     public static final int FILE_TYPE_JPG = 0x1;
 
-    private int attestationType;
-    private int fileType;
-    private String label;
-    private String filename;
+    private final int attestationType;
+    private final int fileType;
+    private final String label;
+    private final String filename;
 
 
     public AttestationPermanente(int _attestationType, int _fileType, String _label)

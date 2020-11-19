@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -35,6 +34,22 @@ public class FirstFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         ((MainActivity)getActivity()).setActionBarTitle("Attestation-inator");
+
+        view.findViewById(R.id.info_but).setOnClickListener(view1 -> NavHostFragment.findNavController(FirstFragment.this)
+                .navigate(R.id.action_FirstFragment_to_aproposFragment));
+
+        view.findViewById(R.id.button_new).setOnClickListener(view12 -> {
+
+            if (((MainActivity)getActivity()).isProfilFull()) {
+                NavHostFragment.findNavController(FirstFragment.this)
+                        .navigate(R.id.action_FirstFragment_to_newAttFragment);
+            }
+            else
+            {
+                Snackbar mySnackbar = Snackbar.make(view, "Veuillez compléter votre profil", Snackbar.LENGTH_SHORT);
+                mySnackbar.show();
+            }
+        });
 
         view.findViewById(R.id.button_profil).setOnClickListener(view1 -> NavHostFragment.findNavController(FirstFragment.this)
                 .navigate(R.id.action_FirstFragment_to_SecondFragment));

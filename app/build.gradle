@@ -10,8 +10,8 @@ android {
         applicationId "com.roguichou.attestinator"
         minSdkVersion 30
         targetSdkVersion 30
-        versionCode 5
-        versionName "2.1"
+        versionCode 7
+        versionName "3.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -46,5 +46,6 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.3.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.github.MikeOrtiz:TouchImageView:3.0.1'
+    implementation 'com.opencsv:opencsv:4.0'
 
 }
