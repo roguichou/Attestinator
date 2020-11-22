@@ -1,5 +1,6 @@
 package com.roguichou.attestinator;
 
+import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -7,6 +8,7 @@ import androidx.annotation.NonNull;
 import com.opencsv.CSVWriter;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -14,6 +16,7 @@ import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Locale;
 
 public class Logger {
 
@@ -31,8 +34,21 @@ public class Logger {
 
     private String filename;
 
-    public Logger(String fn, int _logLevel)
+    public Logger(Context ctx, int _logLevel)
     {
+        String fn = ctx.getFilesDir()+"/log.csv";
+        try {
+            File file = new File(fn);
+            if (!file.exists())
+            {
+                file.createNewFile();
+            }
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
         init_writer(fn, _logLevel, StandardOpenOption.APPEND);
     }
 
@@ -65,6 +81,7 @@ public class Logger {
         }
         data.add(new LogData(type,Calendar.getInstance(),log));
         csvWriter.writeNext(new String[]{type, ""+Calendar.getInstance().getTimeInMillis() , log});
+        csvWriter.flushQuietly();
     }
 
     public void endLog()
@@ -117,9 +134,9 @@ public class Logger {
 
     class LogData
     {
-        String type;
-        String log;
-        Calendar cal;
+        private final String type;
+        private final String log;
+        private final Calendar cal;
         LogData(String _type, Calendar _cal, String _log)
         {
             type = _type;
@@ -144,7 +161,7 @@ public class Logger {
                     val.append("<font color=\"grey\">I");
                     break;
             }
-            SimpleDateFormat format = new SimpleDateFormat(" dd/MM/yy HH:mm ");
+            SimpleDateFormat format = new SimpleDateFormat(" dd/MM/yy HH:mm ", Locale.FRENCH);
             val.append((format.format(cal.getTime())));
 
             val.append(log);

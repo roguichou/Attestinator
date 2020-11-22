@@ -15,11 +15,14 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.roguichou.attestinator.attestation.Attestation;
+import com.roguichou.attestinator.attestation.AttestationPermanente;
+import com.roguichou.attestinator.attestation.AttestationTemporaire;
 
 import java.io.File;
 import java.util.Vector;
 
-public class FirstFragment extends Fragment {
+public class MenuFragment extends Fragment {
 
     @Override
     public View onCreateView(
@@ -27,22 +30,26 @@ public class FirstFragment extends Fragment {
             Bundle savedInstanceState
     ) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_first, container, false);
+        return inflater.inflate(R.layout.fragment_menu, container, false);
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         ((MainActivity)getActivity()).setActionBarTitle("Attestation-inator");
+        Profil profil = ((MainActivity)getActivity()).getProfil();
 
-        view.findViewById(R.id.info_but).setOnClickListener(view1 -> NavHostFragment.findNavController(FirstFragment.this)
-                .navigate(R.id.action_FirstFragment_to_aproposFragment));
+        view.findViewById(R.id.info_but).setOnClickListener(view1 -> NavHostFragment.findNavController(MenuFragment.this)
+                .navigate(R.id.action_MenuFragment_to_aproposFragment));
 
-        view.findViewById(R.id.button_new).setOnClickListener(view12 -> {
+        view.findViewById(R.id.button_profil).setOnClickListener(view1 -> NavHostFragment.findNavController(MenuFragment.this)
+                .navigate(R.id.action_MenuFragment_to_SecondFragment));
 
-            if (((MainActivity)getActivity()).isProfilFull()) {
-                NavHostFragment.findNavController(FirstFragment.this)
-                        .navigate(R.id.action_FirstFragment_to_newAttFragment);
+        view.findViewById(R.id.button_new).setOnClickListener(view0 -> {
+
+            if (profil.isValid()) {
+                NavHostFragment.findNavController(MenuFragment.this)
+                        .navigate(R.id.action_MenuFragment_to_newAttFragment);
             }
             else
             {
@@ -51,14 +58,11 @@ public class FirstFragment extends Fragment {
             }
         });
 
-        view.findViewById(R.id.button_profil).setOnClickListener(view1 -> NavHostFragment.findNavController(FirstFragment.this)
-                .navigate(R.id.action_FirstFragment_to_SecondFragment));
-
         view.findViewById(R.id.button_new).setOnClickListener(view12 -> {
 
-            if (((MainActivity)getActivity()).isProfilFull()) {
-                NavHostFragment.findNavController(FirstFragment.this)
-                        .navigate(R.id.action_FirstFragment_to_newAttFragment);
+            if (profil.isValid()) {
+                NavHostFragment.findNavController(MenuFragment.this)
+                        .navigate(R.id.action_MenuFragment_to_newAttFragment);
             }
             else
             {
@@ -68,13 +72,14 @@ public class FirstFragment extends Fragment {
         });
 
         view.findViewById(R.id.button_show_qr).setOnClickListener(view13 -> {
-            File attestation = new File(getActivity().getFilesDir()+"/attestation.pdf");
-            if (attestation.exists()) {
+            AttestationTemporaire attestation = ((MainActivity) getActivity()).getAttestationTemporaire();
+            attestation.setFileType(Attestation.FILE_TYPE_NONE);
+            if(attestation.isValid())
+            {
                 Bundle bundle = new Bundle();
-                bundle.putString("fichier", null);
-                bundle.putInt("type", 0xFF);
-                NavHostFragment.findNavController(FirstFragment.this)
-                        .navigate(R.id.action_FirstFragment_to_afficherFragment, bundle);
+                bundle.putSerializable("attestation",attestation);
+                NavHostFragment.findNavController(MenuFragment.this)
+                        .navigate(R.id.action_MenuFragment_to_afficherFragment, bundle);
             }
             else
             {
@@ -84,13 +89,14 @@ public class FirstFragment extends Fragment {
         });
 
         view.findViewById(R.id.button_show_pdf).setOnClickListener(view14 -> {
-            File attestation = new File(getActivity().getFilesDir()+"/attestation.pdf");
-            if (attestation.exists()) {
+            AttestationTemporaire attestation = ((MainActivity) getActivity()).getAttestationTemporaire();
+            attestation.setFileType(Attestation.FILE_TYPE_PDF);
+            if(attestation.isValid())
+            {
                 Bundle bundle = new Bundle();
-                bundle.putString("fichier", "attestation.pdf");
-                bundle.putInt("type", AttestationPermanente.FILE_TYPE_PDF);
-                NavHostFragment.findNavController(FirstFragment.this)
-                        .navigate(R.id.action_FirstFragment_to_afficherFragment, bundle);
+                bundle.putSerializable("attestation",attestation);
+                NavHostFragment.findNavController(MenuFragment.this)
+                        .navigate(R.id.action_MenuFragment_to_afficherFragment, bundle);
             }
             else
             {
@@ -106,7 +112,7 @@ public class FirstFragment extends Fragment {
     }
 
 
-    private void buildTableShowAttestationPermanente(View view)
+    private void buildTableShowAttestationPermanente(@NonNull View view)
     {
         TableLayout table = (view.findViewById(R.id.table_show_att));
 
@@ -169,10 +175,9 @@ public class FirstFragment extends Fragment {
                 File att_fn = new File(getActivity().getFilesDir()+"/"+attestation.getFilename());
                 if (att_fn.exists()) {
                     Bundle bundle = new Bundle();
-                    bundle.putString("fichier", attestation.getFilename());
-                    bundle.putInt("type", attestation.getFileType());
-                    NavHostFragment.findNavController(FirstFragment.this)
-                            .navigate(R.id.action_FirstFragment_to_afficherFragment, bundle);
+                    bundle.putSerializable("attestation",attestation);
+                    NavHostFragment.findNavController(MenuFragment.this)
+                            .navigate(R.id.action_MenuFragment_to_afficherFragment, bundle);
                 }
                 else
                 {

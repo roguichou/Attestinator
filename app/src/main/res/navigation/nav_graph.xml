@@ -2,25 +2,25 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@id/FirstFragment">
+    app:startDestination="@id/MenuFragment">
 
     <fragment
-        android:id="@+id/FirstFragment"
-        android:name="com.roguichou.attestinator.FirstFragment"
-        android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first">
+        android:id="@+id/MenuFragment"
+        android:name="com.roguichou.attestinator.MenuFragment"
+        android:label="@string/menu_fragment_label"
+        tools:layout="@layout/fragment_menu">
 
         <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
+            android:id="@+id/action_MenuFragment_to_SecondFragment"
             app:destination="@id/SecondFragment" />
         <action
-            android:id="@+id/action_FirstFragment_to_newAttFragment"
+            android:id="@+id/action_MenuFragment_to_newAttFragment"
             app:destination="@id/newAttFragment" />
         <action
-            android:id="@+id/action_FirstFragment_to_afficherFragment"
+            android:id="@+id/action_MenuFragment_to_afficherFragment"
             app:destination="@id/afficherFragment" />
         <action
-            android:id="@+id/action_FirstFragment_to_aproposFragment"
+            android:id="@+id/action_MenuFragment_to_aproposFragment"
             app:destination="@id/aproposFragment" />
     </fragment>
     <fragment
@@ -30,16 +30,16 @@
         tools:layout="@layout/fragment_second">
 
         <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            android:id="@+id/action_SecondFragment_to_MenuFragment"
+            app:destination="@id/MenuFragment" />
     </fragment>
     <fragment
         android:id="@+id/newAttFragment"
         android:name="com.roguichou.attestinator.NewAttFragment"
         android:label="NewAttFragment" >
         <action
-            android:id="@+id/action_newAttFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            android:id="@+id/action_newAttFragment_to_MenuFragment"
+            app:destination="@id/MenuFragment" />
     </fragment>
     <fragment
         android:id="@+id/afficherFragment"
@@ -47,8 +47,8 @@
         android:label="fragment_afficher"
         tools:layout="@layout/fragment_afficher" >
         <action
-            android:id="@+id/action_afficherFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            android:id="@+id/action_afficherFragment_to_MenuFragment"
+            app:destination="@id/MenuFragment" />
         <argument
             android:name="fichier"
             app:argType="string"
@@ -61,7 +61,7 @@
         android:label="fragment_apropos"
         tools:layout="@layout/fragment_apropos" >
         <action
-            android:id="@+id/action_aproposFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            android:id="@+id/action_aproposFragment_to_MenuFragment"
+            app:destination="@id/MenuFragment" />
     </fragment>
 </navigation>

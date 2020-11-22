@@ -14,6 +14,10 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.roguichou.attestinator.attestation.Attestation;
+import com.roguichou.attestinator.attestation.AttestationTemporaire;
+
+
 import android.graphics.pdf.PdfRenderer;
 
 import java.io.File;
@@ -42,22 +46,22 @@ public class AfficherFragment extends Fragment {
         ((MainActivity)getActivity()).setActionBarTitle("Attestation");
 
         image = view.findViewById(R.id.pdf_renderer);
-
-        String fichier = getArguments().getString("fichier");
-        int type = getArguments().getInt("type");
+        Attestation attestation = (Attestation)getArguments().getSerializable("attestation");
+        String fichier = attestation.getFilename();
+        int type = attestation.getFileType();
 
         switch (type)
         {
-            case 0xFF:
+            case Attestation.FILE_TYPE_NONE:
                 view.setBackgroundColor(Color.BLACK);
-                image.setImageBitmap(((MainActivity)getActivity()).getQrBitmap());
+                image.setImageBitmap(((AttestationTemporaire)attestation).getQrBitmap());
                 break;
 
-            case AttestationPermanente.FILE_TYPE_PDF:
+            case Attestation.FILE_TYPE_PDF:
                 view.setBackgroundColor(Color.WHITE);
                 try {
-                    File attestation = new File(getActivity().getFilesDir() + "/" + fichier);
-                    ParcelFileDescriptor fd =	ParcelFileDescriptor.open(attestation,ParcelFileDescriptor.MODE_READ_ONLY);
+                    File att_fn = new File(getActivity().getFilesDir() + "/" + fichier);
+                    ParcelFileDescriptor fd =	ParcelFileDescriptor.open(att_fn,ParcelFileDescriptor.MODE_READ_ONLY);
                     PdfRenderer renderer =new PdfRenderer(fd);
                     PdfRenderer.Page page = renderer.openPage(0);
                     Bitmap bitmap = Bitmap.createBitmap(page.getWidth(), page.getHeight(), Bitmap.Config.ARGB_8888);
@@ -71,13 +75,13 @@ public class AfficherFragment extends Fragment {
                 }
                 break;
 
-            case AttestationPermanente.FILE_TYPE_JPG:
+            case Attestation.FILE_TYPE_JPG:
                 view.setBackgroundColor(Color.BLACK);
 
-                File attestation = new File(getActivity().getFilesDir() + "/" + fichier);
+                File att_fn = new File(getActivity().getFilesDir() + "/" + fichier);
 
                 BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                Bitmap bitmap = BitmapFactory.decodeFile(attestation.getAbsolutePath(),bmOptions);
+                Bitmap bitmap = BitmapFactory.decodeFile(att_fn.getAbsolutePath(),bmOptions);
                 //bitmap = Bitmap.createScaledBitmap(bitmap, view.getWidth(),view.getHeight(),true);
 
                 image.setImageBitmap(bitmap);

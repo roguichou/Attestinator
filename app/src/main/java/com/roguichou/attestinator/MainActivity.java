@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.location.Location;
 import android.os.Bundle;
@@ -31,86 +30,42 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.zxing.WriterException;
-import com.tom_roush.pdfbox.io.RandomAccessBufferedFileInputStream;
-import com.tom_roush.pdfbox.pdfparser.PDFParser;
-import com.tom_roush.pdfbox.pdmodel.PDDocument;
-import com.tom_roush.pdfbox.pdmodel.PDPage;
-import com.tom_roush.pdfbox.pdmodel.PDPageContentStream;
-import com.tom_roush.pdfbox.pdmodel.common.PDRectangle;
-import com.tom_roush.pdfbox.pdmodel.font.PDFont;
-import com.tom_roush.pdfbox.pdmodel.font.PDType1Font;
-import com.tom_roush.pdfbox.pdmodel.graphics.image.LosslessFactory;
-import com.tom_roush.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import com.tom_roush.pdfbox.util.Matrix;
+import com.roguichou.attestinator.attestation.AttestationPermanente;
+import com.roguichou.attestinator.attestation.AttestationTemporaire;
 import com.tom_roush.pdfbox.util.PDFBoxResourceLoader;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Locale;
 import java.util.Vector;
-
-import androidmads.library.qrgenearator.QRGContents;
-import androidmads.library.qrgenearator.QRGEncoder;
 
 public class MainActivity extends AppCompatActivity {
     //clé requête de permission
     private static final int REQUEST_CODE_PERM = 0xC00;
 
-
-
     private FusedLocationProviderClient fusedLocationClient;
     private LocationCallback locationCallback;
-
+    private Location home = null;
 
     //clé de Préférences
-    //Profil
-    private static final String KEY_NAME = "nom";
-    private static final String KEY_FIRST_NAME = "prenom";
-    private static final String KEY_BIRTH_DATE = "date_naiss";
-    private static final String KEY_BIRTH_LOCATION = "lieu_naiss";
-    private static final String KEY_ADD = "addresse";
-    private static final String KEY_POST_CODE = "code_postal";
-    private static final String KEY_CITY = "ville";
     //attestations permanentes
     private static final String KEY_NB_ATT_PERM = "nb_att";
     private static final String KEY_ROOT_ATT_TYPE = "att_type_";
     private static final String KEY_ROOT_FILE_TYPE = "file_type_";
     private static final String KEY_ROOT_LABEL = "label_";
 
-    // dernière attestation
-    private static final String KEY_RAISON = "raison";
-    private static final String KEY_H = "heure";
-    private static final String KEY_MIN = "min";
-
-
     //Préférences
     private SharedPreferences settings;
 
-    private String profil_name = null;
-    private String profil_first_name = null;
-    private String profil_birth_date = null;
-    private String profil_birth_location = null;
-    private String profil_address = null;
-    private String profil_post_code = null;
-    private String profil_city = null;
-
     private Vector<AttestationPermanente> attestations;
-
-    private Calendar heureSortie = null;
-    private Raison raison = null;
+    private AttestationTemporaire att_temp;
 
     private Logger log;
-
+    private Profil profil;
 
     protected MyApp mMyApp;
-    Bitmap qrBitmap = null;
-    private Location home = null;
+
+    private int screen_width;
+
     public static final String CHANNEL_ID = "SortieServiceChannel";
 
 
@@ -157,21 +112,16 @@ public class MainActivity extends AppCompatActivity {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        String fn =getFilesDir()+"/log.csv";
-        try {
-            File file = new File(fn);
-            if (!file.exists())
-            {
-                file.createNewFile();
-            }
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        log = new Logger(fn, Logger.LOG_LEVEL_INFO);
-        initiateSettings();
+        log = new Logger(this, Logger.LOG_LEVEL_INFO);
 
+        profil = new Profil();
+
+        WindowManager mgr= getWindowManager();
+        WindowMetrics metrics = mgr.getCurrentWindowMetrics();
+        Rect ecran = metrics.getBounds();
+        screen_width = ecran.width();
+
+        initiateSettings();
 
         PDFBoxResourceLoader.init(getApplicationContext());
 
@@ -189,6 +139,11 @@ public class MainActivity extends AppCompatActivity {
         {
             params.add(Manifest.permission.CAMERA);
         }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            params.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION);
+        }
+
         if(params.size()>0) {
             String [] perms = new String[params.size()];
             for(int i=0;i<params.size();i++)
@@ -207,161 +162,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public Bitmap getQrBitmap() {
-        return qrBitmap;
-    }
 
-
-    private String getTimeAsString()
-    {
-        return String.format(Locale.FRENCH, "%02d:%02d",  heureSortie.get(Calendar.HOUR_OF_DAY), heureSortie.get(Calendar.MINUTE));
-    }
-
-
-    private void genererQRcode(View view)
-    {
-        SimpleDateFormat frmt = new SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH);
-        String today = frmt.format(heureSortie.getTime());
-        String data = "Cree le: " + today + " a " + getTimeAsString() + ";\n" +
-                "Nom: " + profil_name + "\n" + "Prenom: " + profil_first_name + ";\n" +
-                "Naissance: " + profil_birth_date + " a " + profil_birth_location + ";\n" +
-                "Adresse: " + profil_address + " " + profil_post_code + " " + profil_city + ";\n" +
-                "Sortie: " + today + " a " + getTimeAsString() + ";\n" +
-                "Motifs: " + raison.toString()+";\n";
-
-        WindowManager mgr= getWindowManager();
-        WindowMetrics metrics = mgr.getCurrentWindowMetrics();
-        Rect ecran = metrics.getBounds();
-        QRGEncoder qrgEncoder = new QRGEncoder(data, null, QRGContents.Type.TEXT, ecran.width());
-
-        try {
-            qrBitmap = qrgEncoder.encodeAsBitmap();
-        } catch (WriterException e) {
-            if(view!= null) {
-                Snackbar mySnackbar = Snackbar.make(view, "Erreur à la génération de l'attestation", Snackbar.LENGTH_SHORT);
-                mySnackbar.show();
-            }
-            e.printStackTrace();
-        }
-
-
-        if(view!= null)
-        {
-            Snackbar mySnackbar = Snackbar.make(view, "Attestation générée", Snackbar.LENGTH_SHORT);
-            mySnackbar.show();
-        }
-    }
-
-    private void genererPDF(View view) {
-        InputStream input;
-        PDDocument doc;
-        try {
-            input = getResources().openRawResource(R.raw.certificate);
-            RandomAccessBufferedFileInputStream istream = new RandomAccessBufferedFileInputStream(input);
-            PDFParser parser = new PDFParser(istream);
-            parser.parse();
-            doc = parser.getPDDocument();
-        } catch (Exception e) {
-            Snackbar mySnackbar = Snackbar.make(view, "Erreur à l'ouverture du modèle " + e.toString(), Snackbar.LENGTH_SHORT);
-            mySnackbar.show();
-            return;
-        }
-
-        PDFont font = PDType1Font.HELVETICA;
-        float fontSize = 11.0f;
-
-        PDPage page = doc.getPage(0);
-
-        try (PDPageContentStream contentStream = new PDPageContentStream(doc, page, true, true, true)) {
-            contentStream.beginText();
-            contentStream.setFont(font, fontSize);
-            contentStream.setTextMatrix(Matrix.getTranslateInstance(119, 696));
-            contentStream.showText(profil_name + " " + profil_first_name);
-
-            contentStream.setTextMatrix(Matrix.getTranslateInstance(119, 674));
-            contentStream.showText(profil_birth_date);
-
-            contentStream.setTextMatrix(Matrix.getTranslateInstance(297, 674));
-            contentStream.showText(profil_birth_location);
-
-            contentStream.setTextMatrix(Matrix.getTranslateInstance(133, 652));
-            contentStream.showText(profil_address + " " + profil_post_code + " " + profil_city);
-
-            contentStream.setTextMatrix(Matrix.getTranslateInstance(105, 177));
-            contentStream.showText(profil_city);
-
-            contentStream.setTextMatrix(Matrix.getTranslateInstance(91, 153));
-            Calendar calendar = Calendar.getInstance();
-            SimpleDateFormat frmt = new SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH);
-            String today = frmt.format(calendar.getTime());
-            contentStream.showText(today);
-
-            contentStream.setTextMatrix(Matrix.getTranslateInstance(264, 153));
-            contentStream.showText(getTimeAsString());
-
-
-            contentStream.setFont(font, 18.0f);
-            contentStream.setTextMatrix(Matrix.getTranslateInstance(78, raison.getPosition_y()));
-            contentStream.showText("x");
-            contentStream.endText();
-
-            String data = "Cree le: " + today + " a " + getTimeAsString() + "\n" +
-                    "Nom: " + profil_name + "\n" + "Prenom: " + profil_first_name + "\n" +
-                    "Naissance: " + profil_birth_date + " a " + profil_birth_location + "\n" +
-                    "Adresse: " + profil_address + " " + profil_post_code + " " + profil_city + "\n" +
-                    "Sortie: " + today + " a " + getTimeAsString() + "\n" +
-                    "Motifs: " + raison.toString();
-
-            QRGEncoder qrgEncoder = new QRGEncoder(data, null, QRGContents.Type.TEXT, 96);
-            Bitmap bitmap = qrgEncoder.encodeAsBitmap();
-            PDImageXObject image = LosslessFactory.createFromImage(doc, bitmap);
-            PDRectangle pageSize = page.getMediaBox();
-            contentStream.drawImage(image, pageSize.getWidth() - 156, 100);
-            contentStream.close();
-
-            QRGEncoder qrgEncoder2 = new QRGEncoder(data, null, QRGContents.Type.TEXT, 300);
-            Bitmap bitmap2 = qrgEncoder2.encodeAsBitmap();
-            PDImageXObject image2 = LosslessFactory.createFromImage(doc, bitmap2);
-
-            doc.addPage(new PDPage(PDRectangle.A4));
-            PDPage page2 = doc.getPage(1);
-            PDPageContentStream contentStream2 = new PDPageContentStream(doc, page2, false, true, true);
-            pageSize = page2.getMediaBox();
-            contentStream2.drawImage(image2, 50, pageSize.getHeight() - 350);
-            contentStream2.close();
-        } catch (Exception e) {
-            Snackbar mySnackbar = Snackbar.make(view, "Erreur à l'édition du PDF " + e.toString(), Snackbar.LENGTH_SHORT);
-            Log.e("Atestation-inator", e.toString());
-            mySnackbar.show();
-            return;
-        }
-
-
-        try (FileOutputStream fos = getApplicationContext().openFileOutput("attestation.pdf", Context.MODE_PRIVATE)) {
-            doc.save(fos);
-            doc.close();
-            input.close();
-        } catch (Exception e) {
-            Snackbar mySnackbar = Snackbar.make(view, "Erreur à l'écriture du PDF " + e.toString(), Snackbar.LENGTH_SHORT);
-            mySnackbar.show();
-            return;
-        }
-
-        Snackbar mySnackbar = Snackbar.make(view, "Attestation générée", Snackbar.LENGTH_SHORT);
-        mySnackbar.show();
-    }
-
-    public void genererAttestation(View view, Raison raison, int h, int min) {
-        this.raison= raison;
-        heureSortie = Calendar.getInstance();
-        heureSortie.set(Calendar.HOUR_OF_DAY, h);
-        heureSortie.set(Calendar.MINUTE, min);
-
-        save_attestation_temporaire(h, min);
-
-        genererQRcode(view);
-        genererPDF(view);
-    }
 
 
     private void demarrerService()
@@ -400,41 +201,20 @@ public class MainActivity extends AppCompatActivity {
             Snackbar mySnackbar = Snackbar.make(view, "Erreur: pas d'autorisation de localisation", Snackbar.LENGTH_SHORT);
             mySnackbar.show();
         }
-
-
     }
 
-
-
-
-
-
-
     //settings
-
     private void initiateSettings()
     {
         settings = getPreferences(Context.MODE_PRIVATE);
-        profil_name = settings.getString(KEY_NAME, null);
-        profil_first_name = settings.getString(KEY_FIRST_NAME, null);
-        profil_birth_date = settings.getString(KEY_BIRTH_DATE, null);
-        profil_birth_location = settings.getString(KEY_BIRTH_LOCATION, null);
-        profil_address = settings.getString(KEY_ADD, null);
-        profil_post_code = settings.getString(KEY_POST_CODE, null);
-        profil_city = settings.getString(KEY_CITY, null);
 
-        String raison_s = settings.getString(KEY_RAISON, null);
-        if(null!= raison_s) {
-            raison = Raison.fromString(raison_s);
+        profil.parsePreferences(settings);
 
-            int h = settings.getInt(KEY_H, 0);
-            int min = settings.getInt(KEY_MIN, 0);
-            heureSortie = Calendar.getInstance();
-            heureSortie.set(Calendar.HOUR_OF_DAY, h);
-            heureSortie.set(Calendar.MINUTE, min);
+        att_temp = new AttestationTemporaire(this, profil, screen_width);
 
-            genererQRcode(null);
-        }
+        att_temp.parseSettings(settings);
+
+
 
         attestations = new Vector<>();
 
@@ -448,6 +228,8 @@ public class MainActivity extends AppCompatActivity {
             attestations.add(attestation);
         }
     }
+
+    public AttestationTemporaire getAttestationTemporaire(){return att_temp;}
 
     public Vector<AttestationPermanente> getPermanentAttestations() {
         return attestations;
@@ -489,104 +271,11 @@ public class MainActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    private void save_attestation_temporaire(int h, int min) {
-        SharedPreferences.Editor editor;
-        editor = settings.edit();
-        editor.putString(KEY_RAISON, raison.toString());
-        editor.putInt(KEY_H, h);
-        editor.putInt(KEY_MIN, min);
-        editor.apply();
-    }
+    public Logger getLog(){return log;}
 
-    public boolean isProfilFull()
-    {
-        return (null!=profil_name &&
-                null!=profil_first_name &&
-                null!=profil_birth_date &&
-                null!=profil_birth_location &&
-                null!=profil_address &&
-                null!=profil_post_code &&
-                null!=profil_city );
+    public Profil getProfil() {return profil;}
 
-    }
-
-    public String getProfilName() {
-        return profil_name;
-    }
-
-    public String getProfilFirstName() {
-        return profil_first_name;
-    }
-
-    public String getProfilBirthDate() {
-        return profil_birth_date;
-    }
-
-    public String getProfilBirthLocation() {
-        return profil_birth_location;
-    }
-
-    public String getProfilAddress() {
-        return profil_address;
-    }
-
-    public String getProfilPostCode() {
-        return profil_post_code;
-    }
-
-    public String getProfilCity() {
-        return profil_city;
-    }
-
-
-    public Calendar getHeureSortie() {
-        return heureSortie;
-    }
     public Location getHome(){
         return home;
     }
-
-    public Logger getLog(){return log;}
-
-    public void setProfilName(String _val) {
-        profil_name = _val;
-    }
-
-    public void setProfilFirstName(String _val) {
-        profil_first_name = _val;
-    }
-
-    public void setProfilBirthDate(String _val) {
-        profil_birth_date = _val;
-    }
-
-    public void setProfilBirthLocation(String _val) {
-        profil_birth_location = _val;
-    }
-
-    public void setProfilAddress(String _val) {
-        profil_address = _val;
-    }
-
-    public void setProfilPostCode(String _val) {
-        profil_post_code = _val;
-    }
-
-    public void setProfilCity(String _val) {
-        profil_city = _val;
-    }
-
-    public void saveProfil() {
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putString(KEY_NAME, profil_name);
-        editor.putString(KEY_FIRST_NAME, profil_first_name);
-        editor.putString(KEY_BIRTH_DATE, profil_birth_date);
-        editor.putString(KEY_BIRTH_LOCATION, profil_birth_location);
-        editor.putString(KEY_ADD, profil_address);
-        editor.putString(KEY_POST_CODE, profil_post_code);
-        editor.putString(KEY_CITY, profil_city);
-
-        editor.apply();
-    }
-
 }

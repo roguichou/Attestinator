@@ -1,4 +1,4 @@
-package com.roguichou.attestinator;
+package com.roguichou.attestinator.attestation;
 
 import androidx.annotation.NonNull;
 

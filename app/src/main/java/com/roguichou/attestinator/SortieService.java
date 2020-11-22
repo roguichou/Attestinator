@@ -10,12 +10,12 @@ import android.content.Context;
 import android.content.Intent;
 
 import android.content.pm.PackageManager;
+import android.content.pm.ServiceInfo;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import androidx.core.app.ActivityCompat;
@@ -24,6 +24,7 @@ import androidx.core.app.NotificationCompat;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
+import com.roguichou.attestinator.attestation.Raison;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -89,7 +90,7 @@ public class SortieService extends Service {
             runnableCode = () -> {
                 // Do something here on the main thread
                 Calendar maintenant = Calendar.getInstance();
-                Calendar heure_sortie = currentActivity.getHeureSortie();
+                Calendar heure_sortie = currentActivity.getAttestationTemporaire().getHeureSortie();
                 long delta = (maintenant.getTimeInMillis() - heure_sortie.getTimeInMillis()) / 1000;
                 delta = 60 * 60 - delta;
                 int min = (int) (delta / 60);
@@ -146,7 +147,8 @@ public class SortieService extends Service {
             }
 
 
-            startForeground(NOTIFICATION_ID, notification);
+            startForeground(NOTIFICATION_ID, notification,
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION);
 
             return START_NOT_STICKY;
         }
@@ -179,9 +181,9 @@ public class SortieService extends Service {
                             break;
                         case ACTION_RESTART:
                             currentActivity.getLog().log(Logger.LOG_INFO, "Regenerate request" + context.toString());
-                            Calendar heure_sortie = currentActivity.getHeureSortie();
+                            Calendar heure_sortie = currentActivity.getAttestationTemporaire().getHeureSortie();
                             heure_sortie.add(Calendar.MINUTE, 30);
-                            currentActivity.genererAttestation(currentActivity.findViewById(android.R.id.content), Raison.SPORT_ANIMAUX,
+                            currentActivity.getAttestationTemporaire().genererAttestation(currentActivity.findViewById(android.R.id.content), Raison.SPORT_ANIMAUX,
                                     heure_sortie.get(Calendar.HOUR_OF_DAY), heure_sortie.get(Calendar.MINUTE));
                             break;
                     }

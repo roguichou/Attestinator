@@ -27,6 +27,7 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.roguichou.attestinator.attestation.AttestationPermanente;
 import com.roguichou.attestinator.iconspinner.CustomAdapter;
 import com.roguichou.attestinator.iconspinner.SpinnerModel;
 
@@ -64,46 +65,46 @@ public class SecondFragment extends Fragment {
 
     @Override
     public void onPause() {
-        MainActivity activity = (MainActivity)getActivity();
-        if(null!=activity) {
-            Editable profil_name = ((EditText) fragmentView.findViewById(R.id.editTextTextPersonName)).getText();
-            if (null != profil_name) {
-                activity.setProfilName(profil_name.toString());
-            }
 
-            Editable profil_first_name = ((EditText) fragmentView.findViewById(R.id.editTextTextPersonName2)).getText();
-            if (null != profil_first_name) {
-                activity.setProfilFirstName(profil_first_name.toString());
-            }
+        Profil profil = ((MainActivity)getActivity()).getProfil();
 
-            Editable profil_birth_date = ((EditText) fragmentView.findViewById(R.id.editTextDate)).getText();
-            if (null != profil_birth_date) {
-                activity.setProfilBirthDate(profil_birth_date.toString());
-            }
-
-            Editable profil_birth_location = ((EditText) fragmentView.findViewById(R.id.editTextBirthPlace)).getText();
-            if (null != profil_birth_location) {
-                activity.setProfilBirthLocation(profil_birth_location.toString());
-            }
-
-            Editable profil_address = ((EditText) fragmentView.findViewById(R.id.editTextTextPostalAddress2)).getText();
-            if (null != profil_address) {
-                activity.setProfilAddress(profil_address.toString());
-            }
-
-            Editable profil_post_code = ((EditText) fragmentView.findViewById(R.id.editTextCP)).getText();
-            if (null != profil_post_code) {
-                activity.setProfilPostCode(profil_post_code.toString());
-            }
-
-            Editable profil_city = ((EditText) fragmentView.findViewById(R.id.editTextCity)).getText();
-            if (null != profil_city) {
-                activity.setProfilCity(profil_city.toString());
-            }
-
-
-            activity.saveProfil();
+        Editable profil_name = ((EditText) fragmentView.findViewById(R.id.editTextTextPersonName)).getText();
+        if (null != profil_name) {
+            profil.setProfilName(profil_name.toString());
         }
+
+        Editable profil_first_name = ((EditText) fragmentView.findViewById(R.id.editTextTextPersonName2)).getText();
+        if (null != profil_first_name) {
+            profil.setProfilFirstName(profil_first_name.toString());
+        }
+
+        Editable profil_birth_date = ((EditText) fragmentView.findViewById(R.id.editTextDate)).getText();
+        if (null != profil_birth_date) {
+            profil.setProfilBirthDate(profil_birth_date.toString());
+        }
+
+        Editable profil_birth_location = ((EditText) fragmentView.findViewById(R.id.editTextBirthPlace)).getText();
+        if (null != profil_birth_location) {
+            profil.setProfilBirthLocation(profil_birth_location.toString());
+        }
+
+        Editable profil_address = ((EditText) fragmentView.findViewById(R.id.editTextTextPostalAddress2)).getText();
+        if (null != profil_address) {
+            profil.setProfilAddress(profil_address.toString());
+        }
+
+        Editable profil_post_code = ((EditText) fragmentView.findViewById(R.id.editTextCP)).getText();
+        if (null != profil_post_code) {
+            profil.setProfilPostCode(profil_post_code.toString());
+        }
+
+        Editable profil_city = ((EditText) fragmentView.findViewById(R.id.editTextCity)).getText();
+        if (null != profil_city) {
+            profil.setProfilCity(profil_city.toString());
+        }
+
+        profil.saveProfil();
+
         super.onPause();
     }
 
@@ -242,14 +243,15 @@ public class SecondFragment extends Fragment {
 
         ((MainActivity)getActivity()).setActionBarTitle("Profil");
         fragmentView = view;
+        Profil profil = ((MainActivity)getActivity()).getProfil();
 
-        String profil_name = ((MainActivity)getActivity()).getProfilName();
-        String profil_first_name = ((MainActivity)getActivity()).getProfilFirstName();
-        String profil_birth_date = ((MainActivity)getActivity()).getProfilBirthDate();
-        String profil_birth_location = ((MainActivity)getActivity()).getProfilBirthLocation();
-        String profil_address = ((MainActivity)getActivity()).getProfilAddress();
-        String profil_post_code = ((MainActivity)getActivity()).getProfilPostCode();
-        String profil_city = ((MainActivity)getActivity()).getProfilCity();
+        String profil_name = profil.getProfilName();
+        String profil_first_name = profil.getProfilFirstName();
+        String profil_birth_date = profil.getProfilBirthDate();
+        String profil_birth_location = profil.getProfilBirthLocation();
+        String profil_address = profil.getProfilAddress();
+        String profil_post_code = profil.getProfilPostCode();
+        String profil_city = profil.getProfilCity();
 
         if (null != profil_name) {
             ((EditText) view.findViewById(R.id.editTextTextPersonName)).setText(profil_name);

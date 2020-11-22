@@ -10,8 +10,8 @@ android {
         applicationId "com.roguichou.attestinator"
         minSdkVersion 30
         targetSdkVersion 30
-        versionCode 7
-        versionName "3.1"
+        versionCode 11
+        versionName "3.6"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

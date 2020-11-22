@@ -5,7 +5,7 @@
     android:id="@+id/table_perm_att"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FirstFragment">
+    tools:context=".MenuFragment">
 
     <ImageButton
         android:id="@+id/info_but"

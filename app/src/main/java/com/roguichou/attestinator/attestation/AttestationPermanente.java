@@ -1,18 +1,16 @@
-package com.roguichou.attestinator;
+package com.roguichou.attestinator.attestation;
 
-public class AttestationPermanente {
+
+public class AttestationPermanente extends Attestation {
     public static final int ATTESTATION_TYPE_UNKNOWN = 0xFF;
     public static final int ATTESTATION_TYPE_HOME = 0x0;
     public static final int ATTESTATION_TYPE_WORK = 0x1;
     public static final int ATTESTATION_TYPE_ECOLE = 0x2;
 
-    public static final int FILE_TYPE_PDF = 0x0;
-    public static final int FILE_TYPE_JPG = 0x1;
+    protected final int attestationType;
 
-    private final int attestationType;
-    private final int fileType;
-    private final String label;
-    private final String filename;
+
+    protected final String label;
 
 
     public AttestationPermanente(int _attestationType, int _fileType, String _label)
@@ -36,19 +34,11 @@ public class AttestationPermanente {
     }
 
 
+    public String getLabel() {
+        return label;
+    }
     public int getAttestationType() {
         return attestationType;
     }
 
-    public int getFileType() {
-        return fileType;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public String getFilename() {
-        return filename;
-    }
 }

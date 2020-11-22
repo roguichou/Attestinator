@@ -13,6 +13,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
+import com.roguichou.attestinator.attestation.Raison;
 
 public class NewAttFragment extends Fragment {
 
@@ -102,7 +103,7 @@ public class NewAttFragment extends Fragment {
             }
             else
             {
-                ((MainActivity)getActivity()).genererAttestation(fragmentView, raison, picker.getHour(), picker.getMinute());
+                ((MainActivity)getActivity()).getAttestationTemporaire().genererAttestation(fragmentView, raison, picker.getHour(), picker.getMinute());
 
                 if (raison == Raison.SPORT_ANIMAUX) {
                     ((MainActivity)getActivity()).debuterSortie (fragmentView);
@@ -110,7 +111,7 @@ public class NewAttFragment extends Fragment {
 
 
                 NavHostFragment.findNavController(NewAttFragment.this)
-                        .navigate(R.id.action_newAttFragment_to_FirstFragment);
+                        .navigate(R.id.action_newAttFragment_to_MenuFragment);
 
             }
 
@@ -119,20 +120,4 @@ public class NewAttFragment extends Fragment {
 
 
     }
-
-
-
-
-
-    /*
-     "code": "travail",
-     "code": "achats",
-     "code": "sante",
-  //   "code": "famille",
-  //   "code": "handicap",
-     "code": "sport_animaux",
-  //   "code": "convocation",
-  //   "code": "missions",
-     "code": "enfants",
-*/
 }

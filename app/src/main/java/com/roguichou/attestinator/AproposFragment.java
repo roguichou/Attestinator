@@ -6,7 +6,6 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
 
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -14,7 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.google.android.material.snackbar.Snackbar;
+import java.util.Locale;
 
 public class AproposFragment extends Fragment {
 
@@ -47,7 +46,7 @@ public class AproposFragment extends Fragment {
         activity.setActionBarTitle("A propos");
 
         fragmentView = view;
-        txtView = ((TextView)view.findViewById(R.id.txt_apropos));
+        txtView = view.findViewById(R.id.txt_apropos);
 
         try {
             PackageInfo pInfo = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0);
@@ -118,18 +117,18 @@ public class AproposFragment extends Fragment {
             {
                 //en Mo
                 sz /= 1024;
-                fsz=String.format("%.2f Mo", sz);
+                fsz=String.format(Locale.FRENCH,"%.2f Mo", sz);
             }
             else
             {
                 //en ko
-                fsz=String.format("%.2f ko", sz);
+                fsz=String.format(Locale.FRENCH,"%.2f ko", sz);
             }
         }
         else
         {
             //en octet
-            fsz=String.format("%.0f o", sz);
+            fsz=String.format(Locale.FRENCH,"%.0f o", sz);
         }
         ((TextView)fragmentView.findViewById(R.id.file_size_txt)).setText(""+fsz);
 
