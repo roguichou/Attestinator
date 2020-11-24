@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -117,9 +118,18 @@ public class MainActivity extends AppCompatActivity {
         profil = new Profil();
 
         WindowManager mgr= getWindowManager();
-        WindowMetrics metrics = mgr.getCurrentWindowMetrics();
-        Rect ecran = metrics.getBounds();
-        screen_width = ecran.width();
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            WindowMetrics metrics = mgr.getCurrentWindowMetrics();
+            Rect ecran = metrics.getBounds();
+            screen_width = ecran.width();
+        }
+        else
+        {
+            DisplayMetrics metrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(metrics);
+            screen_width = metrics.widthPixels;
+        }
 
         initiateSettings();
 
@@ -139,7 +149,8 @@ public class MainActivity extends AppCompatActivity {
         {
             params.add(Manifest.permission.CAMERA);
         }
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
             params.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION);
         }
