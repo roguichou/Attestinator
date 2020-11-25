@@ -20,7 +20,7 @@ import com.roguichou.attestinator.attestation.AttestationPermanente;
 import com.roguichou.attestinator.attestation.AttestationTemporaire;
 
 import java.io.File;
-import java.util.Vector;
+import java.util.List;
 
 public class MenuFragment extends Fragment {
 
@@ -121,7 +121,7 @@ public class MenuFragment extends Fragment {
 
         //2. create rows
         Resources res = getResources();
-        Vector<AttestationPermanente> attestations = ((MainActivity)getActivity()).getPermanentAttestations();
+        List<AttestationPermanente> attestations = ((MainActivity)getActivity()).getPermanentAttestations();
         TableRow row = null;
         int col=0;
 

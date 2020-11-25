@@ -33,11 +33,12 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.material.snackbar.Snackbar;
 import com.roguichou.attestinator.attestation.AttestationPermanente;
 import com.roguichou.attestinator.attestation.AttestationTemporaire;
+import com.roguichou.attestinator.db.AttestationsDatabase;
 import com.tom_roush.pdfbox.util.PDFBoxResourceLoader;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Vector;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     //clé requête de permission
@@ -54,11 +55,11 @@ public class MainActivity extends AppCompatActivity {
     private static final String KEY_ROOT_FILE_TYPE = "file_type_";
     private static final String KEY_ROOT_LABEL = "label_";
 
-    //Préférences
-    private SharedPreferences settings;
+    private AttestationsDatabase attestationsDatabase;
 
-    private Vector<AttestationPermanente> attestations;
     private AttestationTemporaire att_temp;
+
+    List<AttestationPermanente> attestations;
 
     private Logger log;
     private Profil profil;
@@ -217,7 +218,8 @@ public class MainActivity extends AppCompatActivity {
     //settings
     private void initiateSettings()
     {
-        settings = getPreferences(Context.MODE_PRIVATE);
+        //Préférences
+        SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
 
         profil.parsePreferences(settings);
 
@@ -226,60 +228,52 @@ public class MainActivity extends AppCompatActivity {
         att_temp.parseSettings(settings);
 
 
-
-        attestations = new Vector<>();
-
+        //legacy
         int nb_att = settings.getInt(KEY_NB_ATT_PERM, 0);
-        for (int i=0; i<nb_att; i++)
-        {
-            int att_type = settings.getInt(KEY_ROOT_ATT_TYPE+i,0);
-            int file_type = settings.getInt(KEY_ROOT_FILE_TYPE+i,0);
-            String label = settings.getString(KEY_ROOT_LABEL+i, null);
-            AttestationPermanente attestation = new AttestationPermanente(att_type, file_type, label);
-            attestations.add(attestation);
+
+
+        attestationsDatabase = AttestationsDatabase.getInstance(MainActivity.this);
+
+        //migration legacy
+        if (nb_att >0) {
+            SharedPreferences.Editor editor;
+            editor = settings.edit();
+            editor.putInt(KEY_NB_ATT_PERM, 0);
+            editor.apply();
+
+            for (int i = 0; i < nb_att; i++) {
+                int att_type = settings.getInt(KEY_ROOT_ATT_TYPE + i, 0);
+                int file_type = settings.getInt(KEY_ROOT_FILE_TYPE + i, 0);
+                String label = settings.getString(KEY_ROOT_LABEL + i, null);
+                AttestationPermanente attestation = new AttestationPermanente(att_type, file_type, label);
+                attestationsDatabase.getAttestationPermanenteDao().insert(attestation);
+            }
         }
+
+        attestations = attestationsDatabase.getAttestationPermanenteDao().getAll();
+
     }
 
     public AttestationTemporaire getAttestationTemporaire(){return att_temp;}
 
-    public Vector<AttestationPermanente> getPermanentAttestations() {
+    public List<AttestationPermanente> getPermanentAttestations() {
         return attestations;
     }
 
     void addAttestation(AttestationPermanente att)
     {
         attestations.add(att);
-        int id = attestations.size()-1;
-        SharedPreferences.Editor editor;
-        editor = settings.edit();
-
-        editor.putInt(KEY_ROOT_ATT_TYPE+id, att.getAttestationType());
-        editor.putInt(KEY_ROOT_FILE_TYPE+id, att.getFileType());
-        editor.putString(KEY_ROOT_LABEL+id, att.getLabel());
-
-        editor.putInt(KEY_NB_ATT_PERM, attestations.size());
-
-        editor.apply();
+        attestationsDatabase.getAttestationPermanenteDao().insert(att);
     }
 
-    void removeAttestation(int idx)
+    void removeAttestation(AttestationPermanente att)
     {
-        AttestationPermanente attestation = attestations.remove(idx);
+        attestations.remove(att);
 
-        File f = new File(getFilesDir()+"/"+attestation.getFilename());
+        File f = new File(getFilesDir()+"/"+att.getFilename());
         f.delete();
-        SharedPreferences.Editor editor;
-        editor = settings.edit();
-        int nb_att = attestations.size();
-        editor.putInt(KEY_NB_ATT_PERM, nb_att);
-        for (int i=0; i<nb_att; i++)
-        {
-            AttestationPermanente att = attestations.get(i);
-            editor.putInt(KEY_ROOT_ATT_TYPE+i, att.getAttestationType());
-            editor.putInt(KEY_ROOT_FILE_TYPE+i, att.getFileType());
-            editor.putString(KEY_ROOT_LABEL+i, att.getLabel());
-        }
-        editor.apply();
+
+        attestationsDatabase.getAttestationPermanenteDao().delete(att);
     }
 
     public Logger getLog(){return log;}
@@ -289,4 +283,6 @@ public class MainActivity extends AppCompatActivity {
     public Location getHome(){
         return home;
     }
+
+
 }

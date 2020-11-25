@@ -36,7 +36,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Vector;
+import java.util.List;
 
 
 //Profil
@@ -195,7 +195,7 @@ public class SecondFragment extends Fragment {
 
         //2. create rows
         Resources res = getResources();
-        Vector<AttestationPermanente> attestations = ((MainActivity)getActivity()).getPermanentAttestations();
+        List<AttestationPermanente> attestations = ((MainActivity)getActivity()).getPermanentAttestations();
         for(int i=0;i<attestations.size();i++)
         {
             AttestationPermanente attestation = attestations.get(i);
@@ -226,10 +226,10 @@ public class SecondFragment extends Fragment {
 
             //2.3 Delete Button
             ImageButton button = (row.findViewById(R.id.button_del_att));
-            button.setTag(i);
+            button.setTag(attestation);
             button.setOnClickListener(v -> {
-                Integer idx = (Integer)v.getTag();
-                ((MainActivity) getActivity()).removeAttestation(idx);
+                AttestationPermanente att = (AttestationPermanente) v.getTag();
+                ((MainActivity) getActivity()).removeAttestation(att);
                 rebuildTableAttestationPermanente();
             });
 

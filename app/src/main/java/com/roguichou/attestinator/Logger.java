@@ -100,12 +100,7 @@ public class Logger {
     public long getLogFileSize()
     {
         File file = new File(String.valueOf(Paths.get(filename)));
-        long sz = 0;
-        if (null != file)
-        {
-            sz = file.length();
-        }
-        return sz;
+        return file.length();
     }
 
     public void clearLog()
