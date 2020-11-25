@@ -7,6 +7,7 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
+import com.roguichou.attestinator.Constants;
 import com.roguichou.attestinator.attestation.AttestationPermanente;
 
 

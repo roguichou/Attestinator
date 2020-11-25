@@ -4,7 +4,7 @@ package com.roguichou.attestinator.attestation;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 
-import com.roguichou.attestinator.db.Constants;
+import com.roguichou.attestinator.Constants;
 
 @Entity (tableName = Constants.ATT_TABLE_NAME)
 public class AttestationPermanente extends Attestation {

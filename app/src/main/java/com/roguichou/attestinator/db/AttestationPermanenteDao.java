@@ -6,13 +6,14 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
+import com.roguichou.attestinator.Constants;
 import com.roguichou.attestinator.attestation.AttestationPermanente;
 
 import java.util.List;
 
 @Dao
 public interface AttestationPermanenteDao {
-    @Query("SELECT * FROM "+Constants.ATT_TABLE_NAME)
+    @Query("SELECT * FROM "+ Constants.ATT_TABLE_NAME)
     List<AttestationPermanente> getAll();
 
 

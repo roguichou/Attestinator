@@ -93,7 +93,7 @@ public class SortieService extends Service {
                 Calendar maintenant = Calendar.getInstance();
                 Calendar heure_sortie = currentActivity.getAttestationTemporaire().getHeureSortie();
                 long delta = (maintenant.getTimeInMillis() - heure_sortie.getTimeInMillis()) / 1000;
-                delta = 60 * 60 - delta;
+                delta = Constants.DUREE_SORTIE - delta;
                 int min = (int) (delta / 60);
                 int sec = (int) (delta - min * 60);
 
@@ -131,7 +131,7 @@ public class SortieService extends Service {
                             currentActivity.getLog().log(Logger.LOG_INFO, "home:"+home.toString()+"loc:" + location.toString() + " dist=" + dist);
                             notificationLayout.setTextViewText(R.id.notif_dist_txt, String.format(Locale.FRENCH,"%d m", dist));
 
-                            if (dist > 1000) {
+                            if (dist > Constants.DISTANCE_MAX) {
                                 notificationLayout.setTextColor(R.id.notif_dist_txt, Color.RED);
                             } else {
                                 notificationLayout.setTextColor(R.id.notif_dist_txt, Color.LTGRAY);

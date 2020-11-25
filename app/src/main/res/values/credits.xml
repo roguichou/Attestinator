@@ -14,5 +14,14 @@
         &lt;li&gt;Icons made by &lt;a href="https://www.flaticon.com/authors/pixel-perfect" title="Pixel perfect"&gt;Pixel perfect&lt;/a&gt; from &lt;a href="https://www.flaticon.com/" title="Flaticon"&gt;www.flaticon.com&lt;/a&gt;&lt;/li&gt;
         &lt;li&gt;Icons made by &lt;a href="https://www.flaticon.com/authors/freepik" title="Freepik"&gt;Freepik&lt;/a&gt; from &lt;a href="https://www.flaticon.com/" title="Flaticon"&gt;www.flaticon.com&lt;/a&gt;&lt;/li&gt;
         &lt;/ul&gt;
+        &lt;big&gt;&lt;font color="#3f48cc"&gt;&lt;u&gt;Librairies:&lt;/u&gt;&lt;/font&gt;&lt;/big&gt;&lt;br&gt;
+        &lt;ul&gt;
+            &lt;li&gt;com.tom_roush:pdfbox-android:1.8.10.1&lt;/li&gt;
+            &lt;li&gt;androidmads.library.qrgenearator:QRGenearator:1.0.3&lt;/li&gt;
+            &lt;li&gt;androidx.appcompat:appcompat:1.2.0&lt;/li&gt;
+            &lt;li&gt;com.github.MikeOrtiz:TouchImageView:3.0.1&lt;/li&gt;
+            &lt;li&gt;com.opencsv:opencsv:4.0&lt;/li&gt;
+        &lt;/ul&gt;
+
     </string>
 </resources>
