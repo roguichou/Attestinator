@@ -33,7 +33,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.material.snackbar.Snackbar;
 import com.roguichou.attestinator.attestation.AttestationPermanente;
 import com.roguichou.attestinator.attestation.AttestationTemporaire;
-import com.roguichou.attestinator.db.AttestationsDatabase;
+import com.roguichou.attestinator.db.AttestinatorDatabase;
 import com.tom_roush.pdfbox.util.PDFBoxResourceLoader;
 
 import java.io.File;
@@ -55,14 +55,15 @@ public class MainActivity extends AppCompatActivity {
     private static final String KEY_ROOT_FILE_TYPE = "file_type_";
     private static final String KEY_ROOT_LABEL = "label_";
 
-    private AttestationsDatabase attestationsDatabase;
+
+    private AttestinatorDatabase attestinatorDatabase;
 
     private AttestationTemporaire att_temp;
 
-    List<AttestationPermanente> attestations;
+    private List<Profil> profils;
+    private List<AttestationPermanente> attestations;
 
     private Logger log;
-    private Profil profil;
 
     protected MyApp mMyApp;
 
@@ -116,7 +117,6 @@ public class MainActivity extends AppCompatActivity {
 
         log = new Logger(this, Logger.LOG_LEVEL_INFO);
 
-        profil = new Profil();
 
         WindowManager mgr= getWindowManager();
 
@@ -221,24 +221,23 @@ public class MainActivity extends AppCompatActivity {
         //Préférences
         SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
 
-        profil.parsePreferences(settings);
+        attestinatorDatabase = AttestinatorDatabase.getInstance(MainActivity.this);
 
-        att_temp = new AttestationTemporaire(this, profil, screen_width);
+        profils = attestinatorDatabase.getAttestinatorDao().getProfils();
 
+        att_temp = new AttestationTemporaire(this,
+                (profils.size()>0)?profils.get(0):null,
+                screen_width);
         att_temp.parseSettings(settings);
-
 
         //legacy
         int nb_att = settings.getInt(KEY_NB_ATT_PERM, 0);
-
-
-        attestationsDatabase = AttestationsDatabase.getInstance(MainActivity.this);
 
         //migration legacy
         if (nb_att >0) {
             SharedPreferences.Editor editor;
             editor = settings.edit();
-            editor.putInt(KEY_NB_ATT_PERM, 0);
+            editor.remove(KEY_NB_ATT_PERM);
             editor.apply();
 
             for (int i = 0; i < nb_att; i++) {
@@ -246,11 +245,11 @@ public class MainActivity extends AppCompatActivity {
                 int file_type = settings.getInt(KEY_ROOT_FILE_TYPE + i, 0);
                 String label = settings.getString(KEY_ROOT_LABEL + i, null);
                 AttestationPermanente attestation = new AttestationPermanente(att_type, file_type, label);
-                attestationsDatabase.getAttestationPermanenteDao().insert(attestation);
+                attestinatorDatabase.getAttestinatorDao().insert(attestation);
             }
         }
 
-        attestations = attestationsDatabase.getAttestationPermanenteDao().getAll();
+        attestations = attestinatorDatabase.getAttestinatorDao().getAttestationsPermanentes();
 
     }
 
@@ -263,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
     void addAttestation(AttestationPermanente att)
     {
         attestations.add(att);
-        attestationsDatabase.getAttestationPermanenteDao().insert(att);
+        attestinatorDatabase.getAttestinatorDao().insert(att);
     }
 
     void removeAttestation(AttestationPermanente att)
@@ -273,16 +272,29 @@ public class MainActivity extends AppCompatActivity {
         File f = new File(getFilesDir()+"/"+att.getFilename());
         f.delete();
 
-        attestationsDatabase.getAttestationPermanenteDao().delete(att);
+        attestinatorDatabase.getAttestinatorDao().delete(att);
     }
 
     public Logger getLog(){return log;}
 
-    public Profil getProfil() {return profil;}
+    public List<Profil> getProfils() {return profils;}
 
     public Location getHome(){
         return home;
     }
 
 
+    public void deleteProfil(Profil profil) {
+        profils.remove(profil);
+        attestinatorDatabase.getAttestinatorDao().delete(profil);
+    }
+
+    public void updateProfil(Profil profil) {
+        attestinatorDatabase.getAttestinatorDao().update(profil);
+    }
+
+    public void addProfil(Profil profil) {
+        profils.add(profil);
+        attestinatorDatabase.getAttestinatorDao().insert(profil);
+    }
 }

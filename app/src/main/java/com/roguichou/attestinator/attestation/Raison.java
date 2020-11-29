@@ -2,17 +2,35 @@ package com.roguichou.attestinator.attestation;
 
 import androidx.annotation.NonNull;
 
+import com.roguichou.attestinator.Constants;
+
 public enum Raison {
 
-    TRAVAIL ("travail", 578),
-    ACHATS ("achats", 533),
-    SANTE ("sante", 477),
- //   FAMILLE ("famille", 435),
- //   HANDICAP ("handicap", 396),
-    SPORT_ANIMAUX ("sport_animaux", 358),
- //   CONVOCATION ("convocation", 295),
- //   MISSIONS  ("missions", 255),
-    ENFANTS ("enfants", 211);
+/*
+  travail: ,
+  achats_culturel_cultuel: ,
+  sante: 434,
+  famille: 410,
+  handicap: 373,
+  sport_animaux: ,
+  convocation: ,
+  missions: ,
+  enfants: ,
+}
+
+
+ */
+   // TRAVAIL ("travail", 553),
+    ACHATS (Constants.CODE_RAISON_ACHATS, 482),
+    SANTE (Constants.CODE_RAISON_SANTE, 434),
+ //   FAMILLE ("famille", 410),
+ //   HANDICAP ("handicap", 373),
+    SPORT_ANIMAUX (Constants.CODE_RAISON_SPORT_ANIMAUX, 349),
+ //   CONVOCATION ("convocation", 276),
+ //   MISSIONS  ("missions", 252),
+    ENFANTS (Constants.CODE_RAISON_ENFANTS, 228);
+
+
 
         private final String code;
         private final int position_y;
@@ -32,19 +50,17 @@ public enum Raison {
 
     public static Raison fromString(String code)
     {
-        switch (code){
-            case "travail":
-                return Raison.TRAVAIL;
-            case "achats":
+        switch (String.valueOf(code)) {
+            case Constants.CODE_RAISON_ACHATS:
                 return Raison.ACHATS;
-            case "sante":
+            case Constants.CODE_RAISON_SANTE:
                 return Raison.SANTE;
-            case "sport_animaux":
+            case Constants.CODE_RAISON_SPORT_ANIMAUX:
                 return Raison.SPORT_ANIMAUX;
-            case "enfants":
+            case Constants.CODE_RAISON_ENFANTS:
                 return Raison.ENFANTS;
         }
-            return null;
+        return null;
     }
 
     public int getPosition_y()

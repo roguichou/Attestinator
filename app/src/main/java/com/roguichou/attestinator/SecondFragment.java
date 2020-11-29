@@ -9,7 +9,6 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,9 +26,10 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.tabs.TabLayout;
 import com.roguichou.attestinator.attestation.AttestationPermanente;
-import com.roguichou.attestinator.iconspinner.CustomAdapter;
-import com.roguichou.attestinator.iconspinner.SpinnerModel;
+import com.roguichou.attestinator.spinner.IconAdapter;
+import com.roguichou.attestinator.spinner.IconSpinnerModel;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -46,13 +46,21 @@ public class SecondFragment extends Fragment {
 
     private  static final int PICK_FILE_GENERIC = 0xE0;
 
-    public final ArrayList<SpinnerModel> CustomListViewValuesArr = new ArrayList<>();
-    CustomAdapter adapter;
-    Spinner spinner;
+    public final ArrayList<IconSpinnerModel> CustomListViewValuesArr = new ArrayList<>();
+    private IconAdapter adapter;
+    private Spinner spinner;
 
     private View fragmentView = null;
+    private TabLayout tabProfils = null;
 
-
+    private EditText labelEdit;
+    private EditText nameEdit;
+    private EditText firstNameEdit;
+    private EditText birthDateEdit;
+    private EditText birthPlaceEdit;
+    private EditText addressEdit;
+    private EditText postCodeEdit;
+    private EditText cityEdit;
 
     @Override
     public View onCreateView(
@@ -63,56 +71,9 @@ public class SecondFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_second, container, false);
     }
 
-    @Override
-    public void onPause() {
-
-        Profil profil = ((MainActivity)getActivity()).getProfil();
-
-        Editable profil_name = ((EditText) fragmentView.findViewById(R.id.editTextTextPersonName)).getText();
-        if (null != profil_name) {
-            profil.setProfilName(profil_name.toString());
-        }
-
-        Editable profil_first_name = ((EditText) fragmentView.findViewById(R.id.editTextTextPersonName2)).getText();
-        if (null != profil_first_name) {
-            profil.setProfilFirstName(profil_first_name.toString());
-        }
-
-        Editable profil_birth_date = ((EditText) fragmentView.findViewById(R.id.editTextDate)).getText();
-        if (null != profil_birth_date) {
-            profil.setProfilBirthDate(profil_birth_date.toString());
-        }
-
-        Editable profil_birth_location = ((EditText) fragmentView.findViewById(R.id.editTextBirthPlace)).getText();
-        if (null != profil_birth_location) {
-            profil.setProfilBirthLocation(profil_birth_location.toString());
-        }
-
-        Editable profil_address = ((EditText) fragmentView.findViewById(R.id.editTextTextPostalAddress2)).getText();
-        if (null != profil_address) {
-            profil.setProfilAddress(profil_address.toString());
-        }
-
-        Editable profil_post_code = ((EditText) fragmentView.findViewById(R.id.editTextCP)).getText();
-        if (null != profil_post_code) {
-            profil.setProfilPostCode(profil_post_code.toString());
-        }
-
-        Editable profil_city = ((EditText) fragmentView.findViewById(R.id.editTextCity)).getText();
-        if (null != profil_city) {
-            profil.setProfilCity(profil_city.toString());
-        }
-
-        profil.saveProfil();
-
-        super.onPause();
-    }
-
 
     private void saveAttestationFile(Uri uri, String dest_fn)
     {
-
-
         File f = new File(getActivity().getFilesDir()+"/"+dest_fn);
 
         try {
@@ -170,7 +131,7 @@ public class SecondFragment extends Fragment {
             }
 
 
-            SpinnerModel model = (SpinnerModel)spinner.getSelectedItem();
+            IconSpinnerModel model = (IconSpinnerModel)spinner.getSelectedItem();
             AttestationPermanente attestation = new AttestationPermanente(model.getType(),
                     fileType,
                     ((TextView)fragmentView.findViewById(R.id.label_att_perm)).getText().toString());
@@ -243,54 +204,160 @@ public class SecondFragment extends Fragment {
 
         ((MainActivity)getActivity()).setActionBarTitle("Profil");
         fragmentView = view;
-        Profil profil = ((MainActivity)getActivity()).getProfil();
 
-        String profil_name = profil.getProfilName();
-        String profil_first_name = profil.getProfilFirstName();
-        String profil_birth_date = profil.getProfilBirthDate();
-        String profil_birth_location = profil.getProfilBirthLocation();
-        String profil_address = profil.getProfilAddress();
-        String profil_post_code = profil.getProfilPostCode();
-        String profil_city = profil.getProfilCity();
+        labelEdit = view.findViewById(R.id.profil_label);
+        nameEdit = view.findViewById(R.id.editTextTextPersonName);
+        firstNameEdit = view.findViewById(R.id.editTextTextPersonName2);
+        birthDateEdit = view.findViewById(R.id.editTextDate);
+        birthPlaceEdit = view.findViewById(R.id.editTextBirthPlace);
+        addressEdit = view.findViewById(R.id.editTextTextPostalAddress2);
+        postCodeEdit = view.findViewById(R.id.editTextCP);
+        cityEdit = view.findViewById(R.id.editTextCity);
 
-        if (null != profil_name) {
-            ((EditText) view.findViewById(R.id.editTextTextPersonName)).setText(profil_name);
-        }
-        if (null != profil_first_name) {
-            ((EditText) view.findViewById(R.id.editTextTextPersonName2)).setText(profil_first_name);
-        }
-        if (null != profil_birth_date) {
-            ((EditText) view.findViewById(R.id.editTextDate)).setText(profil_birth_date);
-        }
-        if (null != profil_birth_location) {
-            ((EditText) view.findViewById(R.id.editTextBirthPlace)).setText(profil_birth_location);
-        }
-        if (null != profil_address) {
-            ((EditText) view.findViewById(R.id.editTextTextPostalAddress2)).setText(profil_address);
-        }
-        if (null != profil_post_code) {
-            ((EditText) view.findViewById(R.id.editTextCP)).setText(profil_post_code);
-        }
-        if (null != profil_city) {
-            ((EditText) view.findViewById(R.id.editTextCity)).setText(profil_city);
-        }
+        List<Profil> profils = ((MainActivity)getActivity()).getProfils();
 
+        tabProfils = view.findViewById(R.id.tab_profils);
+
+        tabProfils.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                Profil profil = (Profil)tab.getTag();
+                if(profil != null) {
+                    labelEdit.setText(profil.getLabel());
+                    nameEdit.setText(profil.getName());
+                    firstNameEdit.setText(profil.getFirstName());
+                    birthDateEdit.setText(profil.getBirthDate());
+                    birthPlaceEdit.setText(profil.getBirthLocation());
+                    addressEdit.setText(profil.getAddress());
+                    postCodeEdit.setText(profil.getPostCode());
+                    cityEdit.setText(profil.getCity());
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                labelEdit.setText("");
+                nameEdit.setText("");
+                firstNameEdit.setText("");
+                birthDateEdit.setText("");
+                birthPlaceEdit.setText("");
+                addressEdit.setText("");
+                postCodeEdit.setText("");
+                cityEdit.setText("");
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
+        view.findViewById(R.id.buttonSave).setOnClickListener(view100->{
+            boolean isNew = false;
+            Profil profil = (Profil)tabProfils.getTabAt(tabProfils.getSelectedTabPosition()).getTag();
+            //si c'est null, alors on est dans l'onglet de création de profil. Sinon c'est une màj de profil
+            if (null == profil)
+            {
+                isNew = true;
+                profil = new Profil();
+            }
+
+            if(null!= labelEdit.getText()) {
+                profil.setLabel(labelEdit.getText().toString());
+            }
+            if(null!= nameEdit.getText()) {
+                profil.setName(nameEdit.getText().toString());
+            }
+            if(null!= firstNameEdit.getText()) {
+                profil.setFirstName(firstNameEdit.getText().toString());
+            }
+            if(null!= birthDateEdit.getText()) {
+                profil.setBirthDate(birthDateEdit.getText().toString());
+            }
+            if(null!= birthPlaceEdit.getText()) {
+                profil.setBirthLocation(birthPlaceEdit.getText().toString());
+            }
+            if(null!= addressEdit.getText()) {
+                profil.setAddress(addressEdit.getText().toString());
+            }
+            if(null!= postCodeEdit.getText()) {
+                profil.setPostCode(postCodeEdit.getText().toString());
+            }
+            if(null!= cityEdit.getText()) {
+                profil.setCity(cityEdit.getText().toString());
+            }
+
+            //on vérifie que tous les champs sont bien remplis
+            if(profil.isValid())
+            {
+                if (isNew)
+                {
+                    ((MainActivity)getActivity()).addProfil(profil);
+                    TabLayout.Tab tab = tabProfils.newTab();
+                    tab.setText(profil.getLabel());
+                    tab.setTag(profil);
+                    //on insère juste à gauche du "+"
+                    tabProfils.addTab(tab, tabProfils.getTabCount()-1);
+                    tabProfils.selectTab(tab);
+                }
+                else
+                {
+                    ((MainActivity)getActivity()).updateProfil(profil);
+                }
+            }
+            else
+            {
+                Snackbar mySnackbar = Snackbar.make(view, "Veuillez compléter le profil", Snackbar.LENGTH_SHORT);
+                mySnackbar.show();
+            }
+        });
+
+        view.findViewById(R.id.buttonDelete).setOnClickListener(view101-> {
+            int idx = tabProfils.getSelectedTabPosition();
+            Profil profil = (Profil)tabProfils.getTabAt(idx).getTag();
+            if(null != profil)
+            {
+                tabProfils.removeTabAt(idx);
+                ((MainActivity)getActivity()).deleteProfil(profil);
+            }
+            else
+            {
+                labelEdit.setText("");
+                nameEdit.setText("");
+                firstNameEdit.setText("");
+                birthDateEdit.setText("");
+                birthPlaceEdit.setText("");
+                addressEdit.setText("");
+                postCodeEdit.setText("");
+                cityEdit.setText("");
+            }
+        });
+
+        for(int i=0; i<profils.size();i++)
+        {
+            Profil profil = profils.get(i);
+            TabLayout.Tab tab = tabProfils.newTab();
+            tab.setText(profil.getLabel());
+            tab.setTag(profil);
+            tabProfils.addTab(tab,i);
+        }
+        tabProfils.selectTab(tabProfils.getTabAt(0));
 
         //peupler le spinner d'attestations  permanentes
-        CustomListViewValuesArr.add(new SpinnerModel("ic_profile", AttestationPermanente.ATTESTATION_TYPE_UNKNOWN));
-        CustomListViewValuesArr.add(new SpinnerModel("ic_home", AttestationPermanente.ATTESTATION_TYPE_HOME));
-        CustomListViewValuesArr.add(new SpinnerModel("ic_work", AttestationPermanente.ATTESTATION_TYPE_WORK));
-        CustomListViewValuesArr.add(new SpinnerModel("ic_school", AttestationPermanente.ATTESTATION_TYPE_ECOLE));
+        CustomListViewValuesArr.add(new IconSpinnerModel("ic_profile", AttestationPermanente.ATTESTATION_TYPE_UNKNOWN));
+        CustomListViewValuesArr.add(new IconSpinnerModel("ic_home", AttestationPermanente.ATTESTATION_TYPE_HOME));
+        CustomListViewValuesArr.add(new IconSpinnerModel("ic_work", AttestationPermanente.ATTESTATION_TYPE_WORK));
+        CustomListViewValuesArr.add(new IconSpinnerModel("ic_school", AttestationPermanente.ATTESTATION_TYPE_ECOLE));
 
         // Create custom adapter object ( see below CustomAdapter.java )
-        adapter = new CustomAdapter(getContext(), R.layout.spinner_rows, CustomListViewValuesArr,getResources());
+        adapter = new IconAdapter(getContext(), R.layout.spinner_rows, CustomListViewValuesArr,getResources());
         // Set adapter to spinner
         spinner = view.findViewById(R.id.spinner);
         spinner.setAdapter(adapter);
 
 
         view.findViewById(R.id.att_perm_browse).setOnClickListener(view1->{
-            SpinnerModel model = (SpinnerModel)spinner.getSelectedItem();
+            IconSpinnerModel model = (IconSpinnerModel)spinner.getSelectedItem();
             if (model.getType()==AttestationPermanente.ATTESTATION_TYPE_UNKNOWN ||
                     ((TextView)view.findViewById(R.id.label_att_perm)).length()<2  )
             {
@@ -313,7 +380,7 @@ public class SecondFragment extends Fragment {
 
         view.findViewById(R.id.att_perm_photo).setOnClickListener(view2-> {
 
-            SpinnerModel model = (SpinnerModel)spinner.getSelectedItem();
+            IconSpinnerModel model = (IconSpinnerModel)spinner.getSelectedItem();
             if (model.getType()==AttestationPermanente.ATTESTATION_TYPE_UNKNOWN ||
                     ((TextView)view.findViewById(R.id.label_att_perm)).length()<2  )
             {

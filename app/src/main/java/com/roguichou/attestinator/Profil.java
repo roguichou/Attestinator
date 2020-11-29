@@ -2,9 +2,16 @@ package com.roguichou.attestinator;
 
 import android.content.SharedPreferences;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
+@Entity (tableName = Constants.PROFIL_TABLE_NAME)
 public class Profil
 {
     //Préférences
+    @Ignore
     private SharedPreferences settings;
     //clé de Préférences
     private static final String KEY_NAME = "nom";
@@ -15,94 +22,87 @@ public class Profil
     private static final String KEY_POST_CODE = "code_postal";
     private static final String KEY_CITY = "ville";
 
-    private String profil_name = null;
-    private String profil_first_name = null;
-    private String profil_birth_date = null;
-    private String profil_birth_location = null;
-    private String profil_address = null;
-    private String profil_post_code = null;
-    private String profil_city = null;
+    @PrimaryKey(autoGenerate = true)
+    public int uid;
 
+    @ColumnInfo(name = "label")
+    private String label = null;
+    @ColumnInfo(name = "name")
+    private String name = null;
+    @ColumnInfo(name = "first_name")
+    private String firstName = null;
+    @ColumnInfo(name = "birth_date")
+    private String birthDate = null;
+    @ColumnInfo(name = "birth_location")
+    private String birthLocation = null;
+    @ColumnInfo(name = "address")
+    private String address = null;
+    @ColumnInfo(name = "post_code")
+    private String postCode = null;
+    @ColumnInfo(name = "city")
+    private String city = null;
 
-    public void parsePreferences(SharedPreferences settings)
-    {
-        this.settings = settings;
-        profil_name = settings.getString(KEY_NAME, null);
-        profil_first_name = settings.getString(KEY_FIRST_NAME, null);
-        profil_birth_date = settings.getString(KEY_BIRTH_DATE, null);
-        profil_birth_location = settings.getString(KEY_BIRTH_LOCATION, null);
-        profil_address = settings.getString(KEY_ADD, null);
-        profil_post_code = settings.getString(KEY_POST_CODE, null);
-        profil_city = settings.getString(KEY_CITY, null);
-    }
 
     public boolean isValid()
     {
-        return (null!=profil_name &&
-                null!=profil_first_name &&
-                null!=profil_birth_date &&
-                null!=profil_birth_location &&
-                null!=profil_address &&
-                null!=profil_post_code &&
-                null!=profil_city );
+        return (null!=label &&
+                null!=name &&
+                null!=firstName &&
+                null!=birthDate &&
+                null!=birthLocation &&
+                null!=address &&
+                null!=postCode &&
+                null!=city );
 
     }
 
-    public String getProfilName() {
-        return profil_name;
+    public String getLabel() { return label; }
+    public String getName() {
+        return name;
     }
-    public String getProfilFirstName() {
-        return profil_first_name;
+    public String getFirstName() {
+        return firstName;
     }
-    public String getProfilBirthDate() {
-        return profil_birth_date;
+    public String getBirthDate() {
+        return birthDate;
     }
-    public String getProfilBirthLocation() {
-        return profil_birth_location;
+    public String getBirthLocation() {
+        return birthLocation;
     }
-    public String getProfilAddress() {
-        return profil_address;
+    public String getAddress() {
+        return address;
     }
-    public String getProfilPostCode() {
-        return profil_post_code;
+    public String getPostCode() {
+        return postCode;
     }
-    public String getProfilCity() {
-        return profil_city;
-    }
-
-    public void setProfilName(String _val) {
-        profil_name = _val;
-    }
-    public void setProfilFirstName(String _val) {
-        profil_first_name = _val;
-    }
-    public void setProfilBirthDate(String _val) {
-        profil_birth_date = _val;
-    }
-    public void setProfilBirthLocation(String _val) {
-        profil_birth_location = _val;
-    }
-    public void setProfilAddress(String _val) {
-        profil_address = _val;
-    }
-    public void setProfilPostCode(String _val) {
-        profil_post_code = _val;
-    }
-    public void setProfilCity(String _val) {
-        profil_city = _val;
+    public String getCity() {
+        return city;
     }
 
-    public void saveProfil() {
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putString(KEY_NAME, profil_name);
-        editor.putString(KEY_FIRST_NAME, profil_first_name);
-        editor.putString(KEY_BIRTH_DATE, profil_birth_date);
-        editor.putString(KEY_BIRTH_LOCATION, profil_birth_location);
-        editor.putString(KEY_ADD, profil_address);
-        editor.putString(KEY_POST_CODE, profil_post_code);
-        editor.putString(KEY_CITY, profil_city);
-
-        editor.apply();
+    public void setLabel(String _val) { label = _val; }
+    public void setName(String _val) { name = _val; }
+    public void setFirstName(String _val) {
+        firstName = _val;
+    }
+    public void setBirthDate(String _val) {
+        birthDate = _val;
+    }
+    public void setBirthLocation(String _val) {
+        birthLocation = _val;
+    }
+    public void setAddress(String _val) {
+        address = _val;
+    }
+    public void setPostCode(String _val) {
+        postCode = _val;
+    }
+    public void setCity(String _val) {
+        city = _val;
     }
 
+    @Override
+    public String toString()
+    {
+        return label;
+    }
 }

@@ -2,8 +2,44 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tlField"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="256dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="Profil"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatAutoCompleteTextView
+            android:id="@+id/profilDropDown"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:editable="false"
+            android:imeOptions="flagNoExtractUi"
+            android:includeFontPadding="false"
+            android:inputType="none"
+            android:maxLines="1"
+            tools:hint="Please select something" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <View
+        android:id="@+id/divider7"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tlField" />
 
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/raison_group"
@@ -13,17 +49,9 @@
         app:chipSpacingVertical="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider7"
         app:singleLine="false"
         app:singleSelection="true">
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/raison_work"
-            android:layout_width="256dp"
-            android:layout_height="wrap_content"
-            android:checkable="true"
-            android:text="@string/trajet_domicile_travail"
-            app:chipIcon="@drawable/ic_baseline_home_work_24" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/raison_courses"

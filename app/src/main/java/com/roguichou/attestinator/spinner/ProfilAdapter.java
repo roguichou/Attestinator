@@ -1,4 +1,4 @@
-package com.roguichou.attestinator.iconspinner;
+package com.roguichou.attestinator.spinner;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -7,31 +7,29 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import java.util.ArrayList;
-
+import com.roguichou.attestinator.Profil;
 import com.roguichou.attestinator.R;
 
-public class CustomAdapter extends ArrayAdapter<String> {
+import java.util.ArrayList;
 
-    private final ArrayList<SpinnerModel> data;
-    private final Resources res;
+public class ProfilAdapter extends ArrayAdapter<Profil> {
+
+    private final ArrayList<Profil> data;
     private final LayoutInflater inflater;
 
     /*************  CustomAdapter Constructor *****************/
-    public CustomAdapter(
+    public ProfilAdapter(
             Context context,
             int textViewResourceId,
-            ArrayList objects,
-            Resources resLocal
-    )
+            ArrayList objects)
     {
         super(context, textViewResourceId, objects);
 
         data     = objects;
-        res      = resLocal;
 
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -49,17 +47,13 @@ public class CustomAdapter extends ArrayAdapter<String> {
     // This funtion called for each row ( Called data.size() times )
     public View getCustomView(int position, ViewGroup parent) {
 
-        View row = inflater.inflate(R.layout.spinner_rows, parent, false);
+        View row = inflater.inflate(android.R.layout.simple_spinner_item, parent, false);
 
-        SpinnerModel tempValues = data.get(position);
+        Profil tempValue = data.get(position);
 
-        ImageView icon = row.findViewById(R.id.image);
+        TextView txt = row.findViewById(android.R.id.text1);
 
-
-        icon.setImageResource(res.getIdentifier
-                    ("com.roguichou.attestinator:drawable/"
-                            + tempValues.getImage(),null,null));
-
+        txt.setText(tempValue.getLabel());
         return row;
     }
 }

@@ -1,12 +1,12 @@
-package com.roguichou.attestinator.iconspinner;
+package com.roguichou.attestinator.spinner;
 
-public class SpinnerModel {
+public class IconSpinnerModel {
 
     private final String image;
     private final int type;
 
     /*********** Set Methods ******************/
-    public SpinnerModel(String _image, int _type)
+    public IconSpinnerModel(String _image, int _type)
     {
         image = _image;
         type = _type;

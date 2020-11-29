@@ -94,12 +94,15 @@ public class SortieService extends Service {
                 Calendar heure_sortie = currentActivity.getAttestationTemporaire().getHeureSortie();
                 long delta = (maintenant.getTimeInMillis() - heure_sortie.getTimeInMillis()) / 1000;
                 delta = Constants.DUREE_SORTIE - delta;
+                int h = (int) delta/(60*60);
+                delta -= h*60*60;
                 int min = (int) (delta / 60);
-                int sec = (int) (delta - min * 60);
+                delta -= min*60;
+                int sec = (int) delta;
 
-                notificationLayout.setTextViewText(R.id.notif_timer_txt,String.format(Locale.FRANCE,"%02d:%02d", min, sec));
+                notificationLayout.setTextViewText(R.id.notif_timer_txt,String.format(Locale.FRANCE,"%d:%02d:%02d", h, min, sec));
 
-                if (delta < 5 * 60) {
+                if (h ==0 && min < 5 ) {
                     notificationLayout.setTextColor(R.id.notif_timer_txt, Color.RED);
                 } else {
                     notificationLayout.setTextColor(R.id.notif_timer_txt, Color.LTGRAY);
@@ -191,7 +194,9 @@ public class SortieService extends Service {
                             currentActivity.getLog().log(Logger.LOG_INFO, "Regenerate request" + context.toString());
                             Calendar heure_sortie = currentActivity.getAttestationTemporaire().getHeureSortie();
                             heure_sortie.add(Calendar.MINUTE, 30);
-                            currentActivity.getAttestationTemporaire().genererAttestation(currentActivity.findViewById(android.R.id.content), Raison.SPORT_ANIMAUX,
+                            currentActivity.getAttestationTemporaire().genererAttestation(currentActivity.findViewById(android.R.id.content),
+                                    currentActivity.getAttestationTemporaire().getProfil(),
+                                    Raison.SPORT_ANIMAUX,
                                     heure_sortie.get(Calendar.HOUR_OF_DAY), heure_sortie.get(Calendar.MINUTE));
                             break;
                     }

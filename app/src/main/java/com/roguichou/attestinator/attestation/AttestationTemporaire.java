@@ -3,6 +3,7 @@ package com.roguichou.attestinator.attestation;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.util.Log;
 import android.view.View;
 
@@ -31,7 +32,38 @@ import java.util.Locale;
 import androidmads.library.qrgenearator.QRGContents;
 import androidmads.library.qrgenearator.QRGEncoder;
 
+//TODO gérer les profils
 public class AttestationTemporaire extends Attestation {
+
+    //taille du texte
+    private static final float PDF_FONT_SZ = 11f;
+    private static final float PDF_REASON_SZ = 12f;
+
+    //position Nom Prénom
+    private static final Point PDF_IDENTITY_POS = new Point (92, 702);
+
+    //Position date de naissance
+    private static final Point PDF_BIRTHDAY_POS = new Point (92, 684);
+
+    //Position lieu de naissance
+    private static final Point PDF_BIRTHPLACE_POS = new Point (214, 684);
+
+    //adresse
+    private static final Point PDF_ADDRESS_POS = new Point (104, 665);
+
+    //position en X des croix
+    private static final int PDF_REASON_X = 47;
+
+    //fait à
+    private static final Point PDF_LOCATION_POS = new Point (83, 76);
+
+    //date de sortie
+    private static final Point PDF_DATE_POS = new Point (63, 58);
+
+    //heure de sortie
+    private static final Point PDF_HEURE_POS = new Point (227, 58);
+
+
 
     //clé de Préférences
     private static final String KEY_RAISON = "raison";
@@ -42,7 +74,7 @@ public class AttestationTemporaire extends Attestation {
     private Raison raison = null;
 
     private Bitmap qrBitmap = null;
-    private final Profil profil;
+    private Profil profil;
 
     private boolean isValid = false;
     private SharedPreferences settings;
@@ -62,16 +94,15 @@ public class AttestationTemporaire extends Attestation {
     {
         this.settings = settings;
         String raison_s = settings.getString(KEY_RAISON, null);
-        if(null!= raison_s) {
-            raison = Raison.fromString(raison_s);
-
+        raison = Raison.fromString(raison_s);
+        if(null!= raison) {
             int h = settings.getInt(KEY_H, 0);
             int min = settings.getInt(KEY_MIN, 0);
             heureSortie = Calendar.getInstance();
             heureSortie.set(Calendar.HOUR_OF_DAY, h);
             heureSortie.set(Calendar.MINUTE, min);
 
-            genererQRcode(null);
+            genererQRcode(null, qr_size);
 
             isValid = true;
         }
@@ -92,22 +123,24 @@ public class AttestationTemporaire extends Attestation {
     }
 
 
-    private void genererQRcode(View view)
+
+    private Bitmap genererQRcode(View view, int sz)
     {
+        Bitmap bmp = null;
         SimpleDateFormat frmt = new SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH);
         String today = frmt.format(heureSortie.getTime());
         String data = "Cree le: " + today + " a " + getTimeAsString() + ";\n" +
-                "Nom: " + profil.getProfilName() + "\n" + "Prenom: " + profil.getProfilFirstName() + ";\n" +
-                "Naissance: " + profil.getProfilBirthDate() + " a " + profil.getProfilBirthLocation() + ";\n" +
-                "Adresse: " + profil.getProfilAddress() + " " + profil.getProfilPostCode() + " " + profil.getProfilCity() + ";\n" +
+                "Nom: " + profil.getName() + "\n" + "Prenom: " + profil.getFirstName() + ";\n" +
+                "Naissance: " + profil.getBirthDate() + " a " + profil.getBirthLocation() + ";\n" +
+                "Adresse: " + profil.getAddress() + " " + profil.getPostCode() + " " + profil.getCity() + ";\n" +
                 "Sortie: " + today + " a " + getTimeAsString() + ";\n" +
                 "Motifs: " + raison.toString()+";\n";
 
 
-        QRGEncoder qrgEncoder = new QRGEncoder(data, null, QRGContents.Type.TEXT, qr_size);
+        QRGEncoder qrgEncoder = new QRGEncoder(data, null, QRGContents.Type.TEXT, sz);
 
         try {
-            qrBitmap = qrgEncoder.encodeAsBitmap();
+            bmp = qrgEncoder.encodeAsBitmap();
         } catch (WriterException e) {
             if(view!= null) {
                 Snackbar mySnackbar = Snackbar.make(view, "Erreur à la génération de l'attestation", Snackbar.LENGTH_SHORT);
@@ -116,13 +149,11 @@ public class AttestationTemporaire extends Attestation {
             e.printStackTrace();
         }
 
-
-        if(view!= null)
-        {
-            Snackbar mySnackbar = Snackbar.make(view, "Attestation générée", Snackbar.LENGTH_SHORT);
-            mySnackbar.show();
-        }
+        return bmp;
     }
+
+
+
 
     private void genererPDF(View view) {
         InputStream input;
@@ -140,59 +171,49 @@ public class AttestationTemporaire extends Attestation {
         }
 
         PDFont font = PDType1Font.HELVETICA;
-        float fontSize = 11.0f;
 
         PDPage page = doc.getPage(0);
 
         try (PDPageContentStream contentStream = new PDPageContentStream(doc, page, true, true, true)) {
             contentStream.beginText();
-            contentStream.setFont(font, fontSize);
-            contentStream.setTextMatrix(Matrix.getTranslateInstance(119, 696));
-            contentStream.showText(profil.getProfilName() + " " + profil.getProfilFirstName());
+            contentStream.setFont(font, PDF_FONT_SZ);
+            contentStream.setTextMatrix(Matrix.getTranslateInstance(PDF_IDENTITY_POS.x, PDF_IDENTITY_POS.y));
+            contentStream.showText(profil.getName() + " " + profil.getFirstName());
 
-            contentStream.setTextMatrix(Matrix.getTranslateInstance(119, 674));
-            contentStream.showText(profil.getProfilBirthDate());
+            contentStream.setTextMatrix(Matrix.getTranslateInstance(PDF_BIRTHDAY_POS.x, PDF_BIRTHDAY_POS.y));
+            contentStream.showText(profil.getBirthDate());
 
-            contentStream.setTextMatrix(Matrix.getTranslateInstance(297, 674));
-            contentStream.showText(profil.getProfilBirthLocation());
+            contentStream.setTextMatrix(Matrix.getTranslateInstance(PDF_BIRTHPLACE_POS.x, PDF_BIRTHPLACE_POS.y));
+            contentStream.showText(profil.getBirthLocation());
 
-            contentStream.setTextMatrix(Matrix.getTranslateInstance(133, 652));
-            contentStream.showText(profil.getProfilAddress() + " " + profil.getProfilPostCode() + " " + profil.getProfilCity());
+            contentStream.setTextMatrix(Matrix.getTranslateInstance(PDF_ADDRESS_POS.x, PDF_ADDRESS_POS.y));
+            contentStream.showText(profil.getAddress() + " " + profil.getPostCode() + " " + profil.getCity());
 
-            contentStream.setTextMatrix(Matrix.getTranslateInstance(105, 177));
-            contentStream.showText(profil.getProfilCity());
+            contentStream.setTextMatrix(Matrix.getTranslateInstance(PDF_LOCATION_POS.x, PDF_LOCATION_POS.y));
+            contentStream.showText(profil.getCity());
 
-            contentStream.setTextMatrix(Matrix.getTranslateInstance(91, 153));
+            contentStream.setTextMatrix(Matrix.getTranslateInstance(PDF_DATE_POS.x, PDF_DATE_POS.y));
             Calendar calendar = Calendar.getInstance();
             SimpleDateFormat frmt = new SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH);
             String today = frmt.format(calendar.getTime());
             contentStream.showText(today);
 
-            contentStream.setTextMatrix(Matrix.getTranslateInstance(264, 153));
+            contentStream.setTextMatrix(Matrix.getTranslateInstance(PDF_HEURE_POS.x, PDF_HEURE_POS.y));
             contentStream.showText(getTimeAsString());
 
 
-            contentStream.setFont(font, 18.0f);
-            contentStream.setTextMatrix(Matrix.getTranslateInstance(78, raison.getPosition_y()));
+            contentStream.setFont(font, PDF_REASON_SZ);
+            contentStream.setTextMatrix(Matrix.getTranslateInstance(PDF_REASON_X, raison.getPosition_y()));
             contentStream.showText("x");
             contentStream.endText();
 
-            String data = "Cree le: " + today + " a " + getTimeAsString() + "\n" +
-                    "Nom: " + profil.getProfilName() + "\n" + "Prenom: " + profil.getProfilFirstName() + "\n" +
-                    "Naissance: " + profil.getProfilBirthDate() + " a " + profil.getProfilBirthLocation() + "\n" +
-                    "Adresse: " + profil.getProfilAddress() + " " + profil.getProfilPostCode() + " " + profil.getProfilCity() + "\n" +
-                    "Sortie: " + today + " a " + getTimeAsString() + "\n" +
-                    "Motifs: " + raison.toString();
-
-            QRGEncoder qrgEncoder = new QRGEncoder(data, null, QRGContents.Type.TEXT, 96);
-            Bitmap bitmap = qrgEncoder.encodeAsBitmap();
+            Bitmap bitmap = genererQRcode(view, 150);
             PDImageXObject image = LosslessFactory.createFromImage(doc, bitmap);
             PDRectangle pageSize = page.getMediaBox();
-            contentStream.drawImage(image, pageSize.getWidth() - 156, 100);
+            contentStream.drawImage(image, pageSize.getWidth() - 156, 25);
             contentStream.close();
 
-            QRGEncoder qrgEncoder2 = new QRGEncoder(data, null, QRGContents.Type.TEXT, 300);
-            Bitmap bitmap2 = qrgEncoder2.encodeAsBitmap();
+            Bitmap bitmap2  = genererQRcode(view, 300);
             PDImageXObject image2 = LosslessFactory.createFromImage(doc, bitmap2);
 
             doc.addPage(new PDPage(PDRectangle.A4));
@@ -223,18 +244,27 @@ public class AttestationTemporaire extends Attestation {
         mySnackbar.show();
     }
 
-    public void genererAttestation(View view, Raison raison, int h, int min) {
+    public void genererAttestation(View view, Profil profil, Raison raison, int h, int min) {
         isValid = true;
         this.raison= raison;
+        this.profil = profil;
         heureSortie = Calendar.getInstance();
         heureSortie.set(Calendar.HOUR_OF_DAY, h);
         heureSortie.set(Calendar.MINUTE, min);
 
         save_attestation_temporaire(h, min);
 
-        genererQRcode(view);
         genererPDF(view);
+        qrBitmap = genererQRcode(view, qr_size);
+
+        if(view!= null)
+        {
+            Snackbar mySnackbar = Snackbar.make(view, "Attestation générée", Snackbar.LENGTH_SHORT);
+            mySnackbar.show();
+        }
     }
+
+    public Profil getProfil() { return profil; }
 
     private void save_attestation_temporaire(int h, int min) {
         SharedPreferences.Editor editor;

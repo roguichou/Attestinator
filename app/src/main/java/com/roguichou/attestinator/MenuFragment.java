@@ -37,7 +37,7 @@ public class MenuFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         ((MainActivity)getActivity()).setActionBarTitle("Attestation-inator");
-        Profil profil = ((MainActivity)getActivity()).getProfil();
+        int nbProfils = ((MainActivity)getActivity()).getProfils().size();
 
         view.findViewById(R.id.info_but).setOnClickListener(view1 -> NavHostFragment.findNavController(MenuFragment.this)
                 .navigate(R.id.action_MenuFragment_to_aproposFragment));
@@ -47,7 +47,7 @@ public class MenuFragment extends Fragment {
 
         view.findViewById(R.id.button_new).setOnClickListener(view0 -> {
 
-            if (profil.isValid()) {
+            if (nbProfils>0) {
                 NavHostFragment.findNavController(MenuFragment.this)
                         .navigate(R.id.action_MenuFragment_to_newAttFragment);
             }
@@ -58,18 +58,6 @@ public class MenuFragment extends Fragment {
             }
         });
 
-        view.findViewById(R.id.button_new).setOnClickListener(view12 -> {
-
-            if (profil.isValid()) {
-                NavHostFragment.findNavController(MenuFragment.this)
-                        .navigate(R.id.action_MenuFragment_to_newAttFragment);
-            }
-            else
-            {
-                Snackbar mySnackbar = Snackbar.make(view, "Veuillez compléter votre profil", Snackbar.LENGTH_SHORT);
-                mySnackbar.show();
-            }
-        });
 
         view.findViewById(R.id.button_show_qr).setOnClickListener(view13 -> {
             AttestationTemporaire attestation = ((MainActivity) getActivity()).getAttestationTemporaire();

@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
@@ -14,12 +16,17 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
 import com.roguichou.attestinator.attestation.Raison;
+import com.roguichou.attestinator.spinner.ProfilAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class NewAttFragment extends Fragment {
 
     private Raison raison = null;
     private View fragmentView = null;
-    TimePicker picker = null;
+    private TimePicker picker = null;
+    private Profil profil = null;
 
     @Override
     public View onCreateView(
@@ -41,6 +48,27 @@ public class NewAttFragment extends Fragment {
 
         fragmentView = view;
 
+        ArrayList<Profil> CustomListViewValuesArr = new ArrayList<>();
+        List<Profil> profils= ((MainActivity)getActivity()).getProfils();
+        for(int i=0;i<profils.size();i++)
+        {
+            CustomListViewValuesArr.add(profils.get(i));
+        }
+        ProfilAdapter adapter = new ProfilAdapter(getContext(), android.R.layout.simple_spinner_item, CustomListViewValuesArr);
+
+        AutoCompleteTextView spinner = view.findViewById(R.id.profilDropDown);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View arg1, int pos,
+                long id) {
+              profil = (Profil) parent.getItemAtPosition(pos);
+           }
+    });
+
+
+
         view.findViewById(R.id.button_generer).setOnClickListener(view1 -> {
             //1. vérifier qu'on a bien une raison
             int chip_id = ((ChipGroup)fragmentView.findViewById(R.id.raison_group)).getCheckedChipId();
@@ -61,13 +89,6 @@ public class NewAttFragment extends Fragment {
 
         });
 
-
-
-        ((Chip)view.findViewById(R.id.raison_work)).setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                raison = Raison.TRAVAIL;
-            }
-        });
 
         ((Chip)view.findViewById(R.id.raison_courses)).setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
@@ -92,18 +113,28 @@ public class NewAttFragment extends Fragment {
 
 
         view.findViewById(R.id.button_generer).setOnClickListener(view12 -> {
-            //1. vérifier qu'on a bien une raison
+
             int chip_id = ((ChipGroup)fragmentView.findViewById(R.id.raison_group)).getCheckedChipId();
 
+            //vérifier qu'on a bien une raison
             if (ChipGroup.NO_ID == chip_id  || null == raison)
             {
                 String msg = "Pas de raison sélectionnée";
                 Snackbar mySnackbar = Snackbar.make(fragmentView, msg, Snackbar.LENGTH_SHORT);
                 mySnackbar.show();
             }
+            //vérifier qu'on a bien un profil sélectionné
+            else if (null == profil)
+            {
+                String msg = "Pas de profil sélectionné";
+                Snackbar mySnackbar = Snackbar.make(fragmentView, msg, Snackbar.LENGTH_SHORT);
+                mySnackbar.show();
+            }
             else
             {
-                ((MainActivity)getActivity()).getAttestationTemporaire().genererAttestation(fragmentView, raison, picker.getHour(), picker.getMinute());
+
+                ((MainActivity)getActivity()).getAttestationTemporaire().genererAttestation(fragmentView,
+                        profil, raison, picker.getHour(), picker.getMinute());
 
                 if (raison == Raison.SPORT_ANIMAUX) {
                     ((MainActivity)getActivity()).debuterSortie (fragmentView);
