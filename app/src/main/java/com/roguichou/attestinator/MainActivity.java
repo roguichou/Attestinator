@@ -38,6 +38,9 @@ import com.tom_roush.pdfbox.util.PDFBoxResourceLoader;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -48,26 +51,17 @@ public class MainActivity extends AppCompatActivity {
     private LocationCallback locationCallback;
     private Location home = null;
 
-    //clé de Préférences
-    //attestations permanentes
-    private static final String KEY_NB_ATT_PERM = "nb_att";
-    private static final String KEY_ROOT_ATT_TYPE = "att_type_";
-    private static final String KEY_ROOT_FILE_TYPE = "file_type_";
-    private static final String KEY_ROOT_LABEL = "label_";
-
-
     private AttestinatorDatabase attestinatorDatabase;
-
-    private AttestationTemporaire att_temp;
 
     private List<Profil> profils;
     private List<AttestationPermanente> attestations;
+    private List<AttestationTemporaire> attTemps;
 
     private Logger log;
 
     protected MyApp mMyApp;
 
-    private int screen_width;
+    private int screenWidth;
 
     public static final String CHANNEL_ID = "SortieServiceChannel";
 
@@ -81,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(serviceChannel);
     }
-
 
     @Override
     public boolean onSupportNavigateUp() {
@@ -123,16 +116,28 @@ public class MainActivity extends AppCompatActivity {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             WindowMetrics metrics = mgr.getCurrentWindowMetrics();
             Rect ecran = metrics.getBounds();
-            screen_width = ecran.width();
+            screenWidth = ecran.width();
         }
         else
         {
             DisplayMetrics metrics = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(metrics);
-            screen_width = metrics.widthPixels;
+            screenWidth = metrics.widthPixels;
         }
 
-        initiateSettings();
+        attestinatorDatabase = AttestinatorDatabase.getInstance(MainActivity.this);
+
+        profils = attestinatorDatabase.getAttestinatorDao().getProfils();
+
+        attTemps = attestinatorDatabase.getAttestinatorDao().getAttestationsTemporaires();
+        Collections.reverse(attTemps);
+
+        //clear old attestations
+        clearOldTempAtt();
+        //handle legacy
+        handleLegacy();
+
+        attestations = attestinatorDatabase.getAttestinatorDao().getAttestationsPermanentes();
 
         PDFBoxResourceLoader.init(getApplicationContext());
 
@@ -174,16 +179,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
-
-    private void demarrerService()
+    private void demarrerService(int h, int min)
     {
-        ContextCompat.startForegroundService(this,
-                new Intent(this, SortieService.class));
+        Intent StartServiceIntent = new Intent(this, SortieService.class);
+        Calendar heureSortie = Calendar.getInstance();
+        heureSortie.set(Calendar.HOUR_OF_DAY,h);
+        heureSortie.set(Calendar.MINUTE, min);
+        StartServiceIntent.putExtra("heureSortie", heureSortie);
+        ContextCompat.startForegroundService(this, StartServiceIntent);
     }
 
-    public void debuterSortie(View view) {
+    public void debuterSortie(View view, int h, int min) {
 
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -197,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
                     if (location != null) {
                         home = location;
                         Log.d("ATTESTINATOR", "home:"+home.toString());
-                        demarrerService();
+                        demarrerService(h, min);
                         fusedLocationClient.removeLocationUpdates(locationCallback);
                     }
                 }
@@ -215,45 +221,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //settings
-    private void initiateSettings()
+    public void prolongerSortie (Calendar heureSortie)
     {
-        //Préférences
-        SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
-
-        attestinatorDatabase = AttestinatorDatabase.getInstance(MainActivity.this);
-
-        profils = attestinatorDatabase.getAttestinatorDao().getProfils();
-
-        att_temp = new AttestationTemporaire(this,
-                (profils.size()>0)?profils.get(0):null,
-                screen_width);
-        att_temp.parseSettings(settings);
-
-        //legacy
-        int nb_att = settings.getInt(KEY_NB_ATT_PERM, 0);
-
-        //migration legacy
-        if (nb_att >0) {
-            SharedPreferences.Editor editor;
-            editor = settings.edit();
-            editor.remove(KEY_NB_ATT_PERM);
-            editor.apply();
-
-            for (int i = 0; i < nb_att; i++) {
-                int att_type = settings.getInt(KEY_ROOT_ATT_TYPE + i, 0);
-                int file_type = settings.getInt(KEY_ROOT_FILE_TYPE + i, 0);
-                String label = settings.getString(KEY_ROOT_LABEL + i, null);
-                AttestationPermanente attestation = new AttestationPermanente(att_type, file_type, label);
-                attestinatorDatabase.getAttestinatorDao().insert(attestation);
-            }
-        }
-
-        attestations = attestinatorDatabase.getAttestinatorDao().getAttestationsPermanentes();
-
+//TODO: récupérer att et regénérer
     }
 
-    public AttestationTemporaire getAttestationTemporaire(){return att_temp;}
 
     public List<AttestationPermanente> getPermanentAttestations() {
         return attestations;
@@ -277,12 +249,13 @@ public class MainActivity extends AppCompatActivity {
 
     public Logger getLog(){return log;}
 
-    public List<Profil> getProfils() {return profils;}
-
     public Location getHome(){
         return home;
     }
 
+    public int getScreenWidth() {return screenWidth; }
+
+    public List<Profil> getProfils() {return profils;}
 
     public void deleteProfil(Profil profil) {
         profils.remove(profil);
@@ -297,4 +270,105 @@ public class MainActivity extends AppCompatActivity {
         profils.add(profil);
         attestinatorDatabase.getAttestinatorDao().insert(profil);
     }
+
+    public void addTempAtt(AttestationTemporaire att) {
+        attTemps.add(0,att);
+        attestinatorDatabase.getAttestinatorDao().insert(att);
+    }
+
+    public List<AttestationTemporaire> getTemporaireAttestations() {
+        return attTemps;
+    }
+
+     //clear old attestations
+    private void clearOldTempAtt()
+    {
+        Calendar maintenant = Calendar.getInstance();
+        long ts = maintenant.getTimeInMillis();
+        Iterator<AttestationTemporaire> attIterator = attTemps.iterator();
+        while (attIterator.hasNext()) {
+            AttestationTemporaire att = attIterator.next();
+            long attTs = att.getHeureSortie().getTimeInMillis();
+            if (ts-attTs > Constants.OBSO_ATT)
+            {
+                attIterator.remove();
+
+                File f = new File(getFilesDir()+"/"+att.getFilename());
+                f.delete();
+
+                attestinatorDatabase.getAttestinatorDao().delete(att);
+            }
+            else
+            {
+                att.setSettings(this, screenWidth);
+            }
+        }
+    }
+
+    //handle legacy
+    private void handleLegacy()
+    {
+        //Préférences
+        SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+
+        //clé de Préférences
+        //attestations permanentes
+        final String KEY_NB_ATT_PERM = "nb_att";
+        final String KEY_ROOT_ATT_TYPE = "att_type_";
+        final String KEY_ROOT_FILE_TYPE = "file_type_";
+        final String KEY_ROOT_LABEL = "label_";
+
+        //legacy
+        int nb_att = settings.getInt(KEY_NB_ATT_PERM, 0);
+
+        //migration legacy
+        if (nb_att >0) {
+            SharedPreferences.Editor editor;
+            editor = settings.edit();
+            editor.remove(KEY_NB_ATT_PERM);
+            editor.apply();
+
+            for (int i = 0; i < nb_att; i++) {
+                int att_type = settings.getInt(KEY_ROOT_ATT_TYPE + i, 0);
+                int file_type = settings.getInt(KEY_ROOT_FILE_TYPE + i, 0);
+                String label = settings.getString(KEY_ROOT_LABEL + i, null);
+                AttestationPermanente attestation = new AttestationPermanente(att_type, file_type, label);
+                attestinatorDatabase.getAttestinatorDao().insert(attestation);
+            }
+        }
+
+        final String KEY_NAME = "nom";
+        final String KEY_FIRST_NAME = "prenom";
+        final String KEY_BIRTH_DATE = "date_naiss";
+        final String KEY_BIRTH_LOCATION = "lieu_naiss";
+        final String KEY_ADD = "addresse";
+        final String KEY_POST_CODE = "code_postal";
+        final String KEY_CITY = "ville";
+
+        String legacyProfilFirstName = settings.getString(KEY_FIRST_NAME, null);
+        if(null != legacyProfilFirstName) {
+            Profil legacyProfil = new Profil();
+            legacyProfil.setLabel(legacyProfilFirstName);
+            legacyProfil.setName(settings.getString(KEY_NAME, null));
+            legacyProfil.setFirstName(legacyProfilFirstName);
+            legacyProfil.setBirthDate(settings.getString(KEY_BIRTH_DATE, null));
+            legacyProfil.setBirthLocation(settings.getString(KEY_BIRTH_LOCATION, null));
+            legacyProfil.setAddress(settings.getString(KEY_ADD, null));
+            legacyProfil.setPostCode(settings.getString(KEY_POST_CODE, null));
+            legacyProfil.setCity(settings.getString(KEY_CITY, null));
+            addProfil(legacyProfil);
+
+            SharedPreferences.Editor editor;
+            editor = settings.edit();
+            editor.remove(KEY_NAME);
+            editor.remove(KEY_FIRST_NAME);
+            editor.remove(KEY_BIRTH_DATE);
+            editor.remove(KEY_BIRTH_LOCATION);
+            editor.remove(KEY_ADD);
+            editor.remove(KEY_POST_CODE);
+            editor.remove(KEY_CITY);
+            editor.apply();
+        }
+    }
 }
+

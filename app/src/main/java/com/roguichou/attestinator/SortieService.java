@@ -25,7 +25,6 @@ import androidx.core.app.NotificationCompat;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
-import com.roguichou.attestinator.attestation.Raison;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -37,6 +36,7 @@ public class SortieService extends Service {
     private Runnable runnableCode = null;
     private NotificationManager mNotificationManager;
     MainActivity currentActivity = null;
+    Calendar heureSortie;
 
     private LocationCallback locationCallback;
 
@@ -48,6 +48,7 @@ public class SortieService extends Service {
             mNotificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
+            heureSortie = (Calendar)intent.getSerializableExtra("heureSortie");
             currentActivity = (MainActivity)((MyApp)this.getApplicationContext()).getCurrentActivity();
 
             Intent notificationIntent = new Intent(this, MainActivity.class);
@@ -79,6 +80,7 @@ public class SortieService extends Service {
 
             Intent switchIntent2 = new Intent(this, ButtonListener.class);
             switchIntent2.setAction(ButtonListener.ACTION_RESTART);
+            switchIntent2.putExtra("heureSortie", heureSortie);
             PendingIntent pendingSwitchIntent2 = PendingIntent.getBroadcast(this, 0,
                     switchIntent2, 0);
 
@@ -91,9 +93,8 @@ public class SortieService extends Service {
             runnableCode = () -> {
                 // Do something here on the main thread
                 Calendar maintenant = Calendar.getInstance();
-                Calendar heure_sortie = currentActivity.getAttestationTemporaire().getHeureSortie();
-                long delta = (maintenant.getTimeInMillis() - heure_sortie.getTimeInMillis()) / 1000;
-                delta = Constants.DUREE_SORTIE - delta;
+                long delta = (maintenant.getTimeInMillis() - heureSortie.getTimeInMillis()) / 1000;
+                delta = Constants.DUREE_SORTIE*60 - delta;
                 int h = (int) delta/(60*60);
                 delta -= h*60*60;
                 int min = (int) (delta / 60);
@@ -192,12 +193,9 @@ public class SortieService extends Service {
                             break;
                         case ACTION_RESTART:
                             currentActivity.getLog().log(Logger.LOG_INFO, "Regenerate request" + context.toString());
-                            Calendar heure_sortie = currentActivity.getAttestationTemporaire().getHeureSortie();
-                            heure_sortie.add(Calendar.MINUTE, 30);
-                            currentActivity.getAttestationTemporaire().genererAttestation(currentActivity.findViewById(android.R.id.content),
-                                    currentActivity.getAttestationTemporaire().getProfil(),
-                                    Raison.SPORT_ANIMAUX,
-                                    heure_sortie.get(Calendar.HOUR_OF_DAY), heure_sortie.get(Calendar.MINUTE));
+                            Calendar heureSortie =(Calendar) intent.getSerializableExtra("heureSortie");
+                            heureSortie.add(Calendar.MINUTE, Constants.DUREE_SORTIE/2);
+                            currentActivity.prolongerSortie(heureSortie);
                             break;
                     }
                 }

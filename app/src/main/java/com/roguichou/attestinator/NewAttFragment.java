@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.TimePicker;
 
@@ -15,6 +14,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
+import com.roguichou.attestinator.attestation.AttestationTemporaire;
 import com.roguichou.attestinator.attestation.Raison;
 import com.roguichou.attestinator.spinner.ProfilAdapter;
 
@@ -48,24 +48,17 @@ public class NewAttFragment extends Fragment {
 
         fragmentView = view;
 
-        ArrayList<Profil> CustomListViewValuesArr = new ArrayList<>();
         List<Profil> profils= ((MainActivity)getActivity()).getProfils();
-        for(int i=0;i<profils.size();i++)
-        {
-            CustomListViewValuesArr.add(profils.get(i));
-        }
+        ArrayList<Profil> CustomListViewValuesArr = new ArrayList<>(profils);
         ProfilAdapter adapter = new ProfilAdapter(getContext(), android.R.layout.simple_spinner_item, CustomListViewValuesArr);
+
 
         AutoCompleteTextView spinner = view.findViewById(R.id.profilDropDown);
         spinner.setAdapter(adapter);
-        spinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-        @Override
-        public void onItemClick(AdapterView<?> parent, View arg1, int pos,
-                long id) {
-              profil = (Profil) parent.getItemAtPosition(pos);
-           }
-    });
+        spinner.setOnItemClickListener((parent, arg1, pos, id) -> profil = (Profil) parent.getItemAtPosition(pos));
+        profil = profils.get(0);
+        spinner.setText(profil.getLabel(), false);
 
 
 
@@ -123,21 +116,22 @@ public class NewAttFragment extends Fragment {
                 Snackbar mySnackbar = Snackbar.make(fragmentView, msg, Snackbar.LENGTH_SHORT);
                 mySnackbar.show();
             }
-            //vérifier qu'on a bien un profil sélectionné
-            else if (null == profil)
-            {
-                String msg = "Pas de profil sélectionné";
-                Snackbar mySnackbar = Snackbar.make(fragmentView, msg, Snackbar.LENGTH_SHORT);
-                mySnackbar.show();
-            }
             else
             {
+                if(null == profil)
+                {
+//TODO générer pour tous les profils
+                }
+                else {
+                    AttestationTemporaire att = new AttestationTemporaire(getContext(), fragmentView,
+                            ((MainActivity) getActivity()).getScreenWidth(),
+                            profil, raison, picker.getHour(), picker.getMinute());
 
-                ((MainActivity)getActivity()).getAttestationTemporaire().genererAttestation(fragmentView,
-                        profil, raison, picker.getHour(), picker.getMinute());
+                    ((MainActivity) getActivity()).addTempAtt(att);
+                }
 
                 if (raison == Raison.SPORT_ANIMAUX) {
-                    ((MainActivity)getActivity()).debuterSortie (fragmentView);
+                    ((MainActivity)getActivity()).debuterSortie (fragmentView, picker.getHour(), picker.getMinute());
                 }
 
 

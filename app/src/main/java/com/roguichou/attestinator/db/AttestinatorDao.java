@@ -10,6 +10,7 @@ import androidx.room.Update;
 import com.roguichou.attestinator.Constants;
 import com.roguichou.attestinator.Profil;
 import com.roguichou.attestinator.attestation.AttestationPermanente;
+import com.roguichou.attestinator.attestation.AttestationTemporaire;
 
 import java.util.List;
 
@@ -17,6 +18,9 @@ import java.util.List;
 public interface AttestinatorDao {
     @Query("SELECT * FROM "+ Constants.ATT_TABLE_NAME)
     List<AttestationPermanente> getAttestationsPermanentes();
+
+    @Query("SELECT * FROM "+ Constants.TMP_TABLE_NAME)
+    List<AttestationTemporaire> getAttestationsTemporaires();
 
     @Query("SELECT * FROM "+ Constants.PROFIL_TABLE_NAME)
     List<Profil> getProfils();
@@ -29,18 +33,26 @@ public interface AttestinatorDao {
     void insert(AttestationPermanente attestation);
 
     /*
-     * update the object in database
-     * @param note, object to be updated
+     * delete the object from database
+     * @param note, object to be deleted
      */
-    @Update
-    void update(AttestationPermanente attestation);
+    @Delete
+    void delete(AttestationPermanente attestation);
+
+
+    /*
+     * Insert the object in database
+     * @param note, object to be inserted
+     */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insert(AttestationTemporaire attestation);
 
     /*
      * delete the object from database
      * @param note, object to be deleted
      */
     @Delete
-    void delete(AttestationPermanente attestation);
+    void delete(AttestationTemporaire attestation);
 
 
     /*

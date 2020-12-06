@@ -2,7 +2,6 @@ package com.roguichou.attestinator.attestation;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
@@ -20,7 +19,6 @@ public abstract class Attestation implements Serializable
     @ColumnInfo(name = "file_type")
     protected int fileType;
 
-    @Ignore
     protected String filename;
 
 
@@ -34,4 +32,5 @@ public abstract class Attestation implements Serializable
         return filename;
     }
 
+    public void setFilename(String filename) {this.filename = filename;}
 }

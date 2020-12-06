@@ -15,7 +15,6 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.roguichou.attestinator.attestation.Attestation;
 import com.roguichou.attestinator.attestation.AttestationPermanente;
 import com.roguichou.attestinator.attestation.AttestationTemporaire;
 
@@ -60,31 +59,25 @@ public class MenuFragment extends Fragment {
 
 
         view.findViewById(R.id.button_show_qr).setOnClickListener(view13 -> {
-            AttestationTemporaire attestation = ((MainActivity) getActivity()).getAttestationTemporaire();
-            attestation.setFileType(Attestation.FILE_TYPE_NONE);
-            if(attestation.isValid())
+            List<AttestationTemporaire> atts = ((MainActivity) getActivity()).getTemporaireAttestations();
+            if(atts.size()>0)
             {
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("attestation",attestation);
                 NavHostFragment.findNavController(MenuFragment.this)
-                        .navigate(R.id.action_MenuFragment_to_afficherFragment, bundle);
+                        .navigate(R.id.action_MenuFragment_to_showQrFragment);
             }
             else
             {
-                Snackbar mySnackbar = Snackbar.make(view13, "Aucune attestation à afficher.", Snackbar.LENGTH_SHORT);
+                Snackbar mySnackbar = Snackbar.make(view, "Aucune attestation à afficher.", Snackbar.LENGTH_SHORT);
                 mySnackbar.show();
             }
         });
 
         view.findViewById(R.id.button_show_pdf).setOnClickListener(view14 -> {
-            AttestationTemporaire attestation = ((MainActivity) getActivity()).getAttestationTemporaire();
-            attestation.setFileType(Attestation.FILE_TYPE_PDF);
-            if(attestation.isValid())
+            List<AttestationTemporaire> atts = ((MainActivity) getActivity()).getTemporaireAttestations();
+            if(atts.size()>0)
             {
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("attestation",attestation);
                 NavHostFragment.findNavController(MenuFragment.this)
-                        .navigate(R.id.action_MenuFragment_to_afficherFragment, bundle);
+                        .navigate(R.id.action_MenuFragment_to_showMultAttFragment);
             }
             else
             {

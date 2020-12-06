@@ -6,15 +6,16 @@ import android.content.Context;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
-import androidx.room.migration.Migration;
-import androidx.sqlite.db.SupportSQLiteDatabase;
+import androidx.room.TypeConverters;
 
 import com.roguichou.attestinator.Constants;
 import com.roguichou.attestinator.Profil;
 import com.roguichou.attestinator.attestation.AttestationPermanente;
+import com.roguichou.attestinator.attestation.AttestationTemporaire;
 
 
-@Database(entities = { AttestationPermanente.class, Profil.class}, version = 3)
+@Database(entities = { AttestationPermanente.class, Profil.class, AttestationTemporaire.class}, version = 6)
+@TypeConverters({RaisonConverter.class, CalendarConverter.class})
 public abstract class AttestinatorDatabase extends RoomDatabase {
 
     public abstract AttestinatorDao getAttestinatorDao();
@@ -37,10 +38,6 @@ public abstract class AttestinatorDatabase extends RoomDatabase {
                 .allowMainThreadQueries()
                 .fallbackToDestructiveMigration()
                 .build();
-    }
-
-    public void cleanUp(){
-        attestinatorDB = null;
     }
 
 }

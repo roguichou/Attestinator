@@ -79,7 +79,7 @@ public class Logger {
         {
             return;
         }
-        data.add(new LogData(type,Calendar.getInstance(),log));
+        data.add(new LogData(type, Calendar.getInstance(), log));
         csvWriter.writeNext(new String[]{type, ""+Calendar.getInstance().getTimeInMillis() , log});
         csvWriter.flushQuietly();
     }
@@ -127,7 +127,7 @@ public class Logger {
         return val.toString();
     }
 
-    class LogData
+    static class LogData
     {
         private final String type;
         private final String log;

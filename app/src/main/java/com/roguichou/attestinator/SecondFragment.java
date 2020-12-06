@@ -47,7 +47,6 @@ public class SecondFragment extends Fragment {
     private  static final int PICK_FILE_GENERIC = 0xE0;
 
     public final ArrayList<IconSpinnerModel> CustomListViewValuesArr = new ArrayList<>();
-    private IconAdapter adapter;
     private Spinner spinner;
 
     private View fragmentView = null;
@@ -303,6 +302,7 @@ public class SecondFragment extends Fragment {
                 else
                 {
                     ((MainActivity)getActivity()).updateProfil(profil);
+                    tabProfils.getTabAt(tabProfils.getSelectedTabPosition()).setText(profil.getLabel());
                 }
             }
             else
@@ -350,7 +350,7 @@ public class SecondFragment extends Fragment {
         CustomListViewValuesArr.add(new IconSpinnerModel("ic_school", AttestationPermanente.ATTESTATION_TYPE_ECOLE));
 
         // Create custom adapter object ( see below CustomAdapter.java )
-        adapter = new IconAdapter(getContext(), R.layout.spinner_rows, CustomListViewValuesArr,getResources());
+        IconAdapter adapter = new IconAdapter(getContext(), R.layout.spinner_rows, CustomListViewValuesArr, getResources());
         // Set adapter to spinner
         spinner = view.findViewById(R.id.spinner);
         spinner.setAdapter(adapter);

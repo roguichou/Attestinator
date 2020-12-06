@@ -1,29 +1,14 @@
 package com.roguichou.attestinator;
 
-import android.content.SharedPreferences;
-
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity (tableName = Constants.PROFIL_TABLE_NAME)
 public class Profil
 {
-    //Préférences
-    @Ignore
-    private SharedPreferences settings;
-    //clé de Préférences
-    private static final String KEY_NAME = "nom";
-    private static final String KEY_FIRST_NAME = "prenom";
-    private static final String KEY_BIRTH_DATE = "date_naiss";
-    private static final String KEY_BIRTH_LOCATION = "lieu_naiss";
-    private static final String KEY_ADD = "addresse";
-    private static final String KEY_POST_CODE = "code_postal";
-    private static final String KEY_CITY = "ville";
-
     @PrimaryKey(autoGenerate = true)
-    public int uid;
+    public int profil_uid;
 
     @ColumnInfo(name = "label")
     private String label = null;
@@ -53,7 +38,6 @@ public class Profil
                 null!=address &&
                 null!=postCode &&
                 null!=city );
-
     }
 
     public String getLabel() { return label; }

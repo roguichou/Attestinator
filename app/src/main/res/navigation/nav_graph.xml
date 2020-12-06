@@ -22,6 +22,12 @@
         <action
             android:id="@+id/action_MenuFragment_to_aproposFragment"
             app:destination="@id/aproposFragment" />
+        <action
+            android:id="@+id/action_MenuFragment_to_showMultAttFragment"
+            app:destination="@id/showMultAttFragment" />
+        <action
+            android:id="@+id/action_MenuFragment_to_showQrFragment"
+            app:destination="@id/showQrFragment" />
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
@@ -62,6 +68,24 @@
         tools:layout="@layout/fragment_apropos" >
         <action
             android:id="@+id/action_aproposFragment_to_MenuFragment"
+            app:destination="@id/MenuFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/showMultAttFragment"
+        android:name="com.roguichou.attestinator.ShowMultAttFragment"
+        android:label="fragment_show_mult_att"
+        tools:layout="@layout/fragment_show_mult_att" >
+        <action
+            android:id="@+id/action_showMultAttFragment_to_MenuFragment"
+            app:destination="@id/MenuFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/showQrFragment"
+        android:name="com.roguichou.attestinator.ShowQrFragment"
+        android:label="fragment_show_qr"
+        tools:layout="@layout/fragment_show_qr" >
+        <action
+            android:id="@+id/action_showQrFragment_to_MenuFragment"
             app:destination="@id/MenuFragment" />
     </fragment>
 </navigation>
