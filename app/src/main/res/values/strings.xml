@@ -47,6 +47,4 @@
     <string name="gestion_d_attestations_de_sortiie">Gestion d\'attestations de sortie</string>
     <string name="attestation_inator">Attestation-inator</string>
     <string name="_169_roguichou_2020">&#169; 2020 by Roguichou</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

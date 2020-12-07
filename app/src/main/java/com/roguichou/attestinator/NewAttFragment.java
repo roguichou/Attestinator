@@ -19,6 +19,7 @@ import com.roguichou.attestinator.attestation.Raison;
 import com.roguichou.attestinator.spinner.ProfilAdapter;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class NewAttFragment extends Fragment {
@@ -49,7 +50,9 @@ public class NewAttFragment extends Fragment {
         fragmentView = view;
 
         List<Profil> profils= ((MainActivity)getActivity()).getProfils();
-        ArrayList<Profil> CustomListViewValuesArr = new ArrayList<>(profils);
+        ArrayList<Profil> CustomListViewValuesArr = new ArrayList<>();
+        CustomListViewValuesArr.add(null);
+        CustomListViewValuesArr.addAll(profils);
         ProfilAdapter adapter = new ProfilAdapter(getContext(), android.R.layout.simple_spinner_item, CustomListViewValuesArr);
 
 
@@ -57,8 +60,7 @@ public class NewAttFragment extends Fragment {
         spinner.setAdapter(adapter);
 
         spinner.setOnItemClickListener((parent, arg1, pos, id) -> profil = (Profil) parent.getItemAtPosition(pos));
-        profil = profils.get(0);
-        spinner.setText(profil.getLabel(), false);
+        spinner.setText("Tous", false);
 
 
 
@@ -120,7 +122,16 @@ public class NewAttFragment extends Fragment {
             {
                 if(null == profil)
                 {
-//TODO générer pour tous les profils
+                    Iterator<Profil> profilIt = profils.iterator();
+                    while (profilIt.hasNext()) {
+                        profil = profilIt.next();
+                        AttestationTemporaire att = new AttestationTemporaire(getContext(), fragmentView,
+                                ((MainActivity) getActivity()).getScreenWidth(),
+                                profil, raison, picker.getHour(), picker.getMinute());
+
+                        ((MainActivity) getActivity()).addTempAtt(att);
+                    }
+                    profil = null;
                 }
                 else {
                     AttestationTemporaire att = new AttestationTemporaire(getContext(), fragmentView,
@@ -131,7 +142,7 @@ public class NewAttFragment extends Fragment {
                 }
 
                 if (raison == Raison.SPORT_ANIMAUX) {
-                    ((MainActivity)getActivity()).debuterSortie (fragmentView, picker.getHour(), picker.getMinute());
+                    ((MainActivity)getActivity()).debuterSortie (fragmentView, profil, picker.getHour(), picker.getMinute());
                 }
 
 

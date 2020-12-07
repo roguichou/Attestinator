@@ -50,7 +50,7 @@ public class ProfilAdapter extends ArrayAdapter<Profil> {
 
         TextView txt = row.findViewById(android.R.id.text1);
 
-        txt.setText(tempValue.getLabel());
+        txt.setText(tempValue==null ? "Tous" : tempValue.getLabel());
         return row;
     }
 }

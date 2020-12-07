@@ -37,6 +37,7 @@ public class SortieService extends Service {
     private NotificationManager mNotificationManager;
     MainActivity currentActivity = null;
     Calendar heureSortie;
+    Profil profil;
 
     private LocationCallback locationCallback;
 
@@ -49,6 +50,7 @@ public class SortieService extends Service {
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
             heureSortie = (Calendar)intent.getSerializableExtra("heureSortie");
+            profil = (Profil)intent.getSerializableExtra("Profil");
             currentActivity = (MainActivity)((MyApp)this.getApplicationContext()).getCurrentActivity();
 
             Intent notificationIntent = new Intent(this, MainActivity.class);
@@ -81,6 +83,7 @@ public class SortieService extends Service {
             Intent switchIntent2 = new Intent(this, ButtonListener.class);
             switchIntent2.setAction(ButtonListener.ACTION_RESTART);
             switchIntent2.putExtra("heureSortie", heureSortie);
+            switchIntent2.putExtra("Profil", profil);
             PendingIntent pendingSwitchIntent2 = PendingIntent.getBroadcast(this, 0,
                     switchIntent2, 0);
 
@@ -182,20 +185,22 @@ public class SortieService extends Service {
             public static final String ACTION_RESTART = "Attestinator.restartTimer";
             @Override
             public void onReceive(Context context, Intent intent) {
+                Intent serviceIntent = new Intent(context, SortieService.class);
                 MainActivity currentActivity = (MainActivity)((MyApp)context.getApplicationContext()).getCurrentActivity();
                 currentActivity.getLog().log(Logger.LOG_INFO, "Button click received from notification");
                 if (intent != null && intent.getAction() != null) {
                     switch (intent.getAction()) {
                         case ACTION_CLOSE:
                             currentActivity.getLog().log(Logger.LOG_INFO, "Close service request");
-                            Intent serviceIntent = new Intent(context, SortieService.class);
                             context.stopService(serviceIntent);
                             break;
                         case ACTION_RESTART:
                             currentActivity.getLog().log(Logger.LOG_INFO, "Regenerate request" + context.toString());
                             Calendar heureSortie =(Calendar) intent.getSerializableExtra("heureSortie");
+                            Profil profil = (Profil)intent.getSerializableExtra("Profil");
                             heureSortie.add(Calendar.MINUTE, Constants.DUREE_SORTIE/2);
-                            currentActivity.prolongerSortie(heureSortie);
+                            context.stopService(serviceIntent);
+                            currentActivity.prolongerSortie(profil, heureSortie);
                             break;
                     }
                 }

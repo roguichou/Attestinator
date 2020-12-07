@@ -4,9 +4,10 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
 @Entity (tableName = Constants.PROFIL_TABLE_NAME)
-public class Profil
-{
+public class Profil implements Serializable {
     @PrimaryKey(autoGenerate = true)
     public int profil_uid;
 

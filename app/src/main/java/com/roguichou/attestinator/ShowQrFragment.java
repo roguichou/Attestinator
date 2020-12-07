@@ -84,23 +84,23 @@ public class ShowQrFragment extends Fragment {
 
             View layout = inflater.inflate(R.layout.show_qr, null);
 
+            if (null!= att) {
+                ((ImageView) layout.findViewById(R.id.qr_img)).setImageBitmap(att.getQrBitmap());
 
-            ((ImageView)layout.findViewById(R.id.qr_img)).setImageBitmap(att.getQrBitmap());
+                ((TextView) layout.findViewById(R.id.show_qr_profil)).setText(att.getProfil().getLabel());
 
-            ((TextView)layout.findViewById(R.id.show_qr_profil)).setText(att.getProfil().getLabel());
+                Calendar heureSortie = att.getHeureSortie();
+                String time = String.format(Locale.FRENCH, "%02d/%02d/%04d %02d:%02d",
+                        heureSortie.get(Calendar.DAY_OF_MONTH),
+                        heureSortie.get(Calendar.MONTH),
+                        heureSortie.get(Calendar.YEAR),
+                        heureSortie.get(Calendar.HOUR_OF_DAY),
+                        heureSortie.get(Calendar.MINUTE));
 
-            Calendar heureSortie = att.getHeureSortie();
-            String time = String.format(Locale.FRENCH, "%02d/%02d/%04d %02d:%02d",
-                    heureSortie.get(Calendar.DAY_OF_MONTH),
-                    heureSortie.get(Calendar.MONTH),
-                    heureSortie.get(Calendar.YEAR),
-                    heureSortie.get(Calendar.HOUR_OF_DAY),
-                    heureSortie.get(Calendar.MINUTE));
+                ((TextView) layout.findViewById(R.id.show_qr_time)).setText(time);
 
-            ((TextView)layout.findViewById(R.id.show_qr_time)).setText(time);
-
-            ((TextView)layout.findViewById(R.id.show_qr_raison)).setText(att.getRaison().toString());
-
+                ((TextView) layout.findViewById(R.id.show_qr_raison)).setText(att.getRaison().toString());
+            }
             container.addView(layout);
 
             return layout;

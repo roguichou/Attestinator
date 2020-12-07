@@ -111,14 +111,17 @@ public class AttestationTemporaire extends Attestation {
         try {
             genererPDF();
             qrBitmap = genererQRcode(qr_size);
-
-            Snackbar mySnackbar = Snackbar.make(view, "Attestation générée", Snackbar.LENGTH_SHORT);
-            mySnackbar.show();
+            if(null!= view) {
+                Snackbar mySnackbar = Snackbar.make(view, "Attestation générée", Snackbar.LENGTH_SHORT);
+                mySnackbar.show();
+            }
         }
         catch (Exception e)
         {
-            Snackbar mySnackbar = Snackbar.make(view, "Erreur à la génération d'attestation", Snackbar.LENGTH_SHORT);
-            mySnackbar.show();
+            if (null != view) {
+                Snackbar mySnackbar = Snackbar.make(view, "Erreur à la génération d'attestation", Snackbar.LENGTH_SHORT);
+                mySnackbar.show();
+            }
         }
     }
 

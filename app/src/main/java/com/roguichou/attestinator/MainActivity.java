@@ -33,6 +33,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.material.snackbar.Snackbar;
 import com.roguichou.attestinator.attestation.AttestationPermanente;
 import com.roguichou.attestinator.attestation.AttestationTemporaire;
+import com.roguichou.attestinator.attestation.Raison;
 import com.roguichou.attestinator.db.AttestinatorDatabase;
 import com.tom_roush.pdfbox.util.PDFBoxResourceLoader;
 
@@ -179,17 +180,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void demarrerService(int h, int min)
+    private void demarrerService(Profil profil, int h, int min)
     {
         Intent StartServiceIntent = new Intent(this, SortieService.class);
         Calendar heureSortie = Calendar.getInstance();
         heureSortie.set(Calendar.HOUR_OF_DAY,h);
         heureSortie.set(Calendar.MINUTE, min);
         StartServiceIntent.putExtra("heureSortie", heureSortie);
+        StartServiceIntent.putExtra("Profil", profil);
         ContextCompat.startForegroundService(this, StartServiceIntent);
     }
 
-    public void debuterSortie(View view, int h, int min) {
+    public void debuterSortie(View view, Profil profil, int h, int min) {
 
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -203,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
                     if (location != null) {
                         home = location;
                         Log.d("ATTESTINATOR", "home:"+home.toString());
-                        demarrerService(h, min);
+                        demarrerService(profil, h, min);
                         fusedLocationClient.removeLocationUpdates(locationCallback);
                     }
                 }
@@ -221,9 +223,28 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void prolongerSortie (Calendar heureSortie)
+    public void prolongerSortie (Profil profil, Calendar heureSortie)
     {
-//TODO: récupérer att et regénérer
+        if(null == profil)
+        {
+            Iterator<Profil> profilIt = profils.iterator();
+            while (profilIt.hasNext()) {
+                profil = profilIt.next();
+                AttestationTemporaire att = new AttestationTemporaire(this, null,
+                        screenWidth, profil, Raison.SPORT_ANIMAUX,
+                        heureSortie.get(Calendar.HOUR_OF_DAY), heureSortie.get(Calendar.MINUTE));
+
+                addTempAtt(att);
+            }
+        }
+        else {
+            AttestationTemporaire att = new AttestationTemporaire(this, null,
+                    screenWidth, profil, Raison.SPORT_ANIMAUX,
+                    heureSortie.get(Calendar.HOUR_OF_DAY), heureSortie.get(Calendar.MINUTE));
+
+            addTempAtt(att);
+        }
+        demarrerService(profil, heureSortie.get(Calendar.HOUR_OF_DAY), heureSortie.get(Calendar.MINUTE));
     }
 
 
