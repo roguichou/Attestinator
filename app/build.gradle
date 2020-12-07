@@ -10,8 +10,8 @@ android {
         applicationId "com.roguichou.attestinator"
         minSdkVersion 28
         targetSdkVersion 28
-        versionCode 19
-        versionName "5.1.0"
+        versionCode 20
+        versionName "5.2.0"
 
         javaCompileOptions {
             annotationProcessorOptions {
